@@ -5,13 +5,8 @@ import logging
 import json
 from pprint import pprint
 import cocoWalker
-from iv import iv,LEFTFEET,RIGHTFEET,LEFTHIP,RIGHTHIP
+from iv import iv,LEFTFEET,RIGHTFEET,LEFTHIP,RIGHTHIP,nam
 
-
-logging.basicConfig(level=logging.DEBUG)
-
-with open("./file.json","r") as fin:
-    dd = json.load(fin)
 
 def lin_equ(l1, l2):
     """Line encoded as l=(x,y)."""
@@ -20,13 +15,20 @@ def lin_equ(l1, l2):
     return m, c
 
 
+logging.basicConfig(level=logging.DEBUG)
 
-nameMap = {
-	"feetL":LEFTFEET,
-	"feetR":RIGHTFEET,
-	"hipL":LEFTHIP,
-	"hipR":RIGHTHIP,
-}
+repeat = 3
+
+dursec= 5
+
+sleepPause= 10 / float(1000)
+
+sampling= float(dursec) /sleepPause
+
+
+# open file
+with open("./file.json","r") as fin:
+    dd = json.load(fin)
 
 
 
@@ -46,12 +48,6 @@ for mot,points in dd.items():
     rngsbymot[motid]=rngs
 
 
-repeat = 3
-dursec= 5
-
-sleepPause= 10 / float(1000)
-
-sampling= float(dursec) /sleepPause
 
 
 sampledPos = []
@@ -69,9 +65,8 @@ for _ in range(int(sampling)):
 
     sampledPos.append(posattime)
 
-#pprint(sampledPos)
 
-
+# play sampledPos
 scales = [80,80,-64,-64]
 
 kit = ServoKit(channels=16)

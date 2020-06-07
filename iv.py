@@ -4,6 +4,12 @@ iv=[90,80,64,90]
 
 LEFTFEET=0
 RIGHTFEET=1
-
 LEFTHIP=3
 RIGHTHIP=2
+
+nameMap = {
+	"feetL":LEFTFEET,
+	"feetR":RIGHTFEET,
+	"hipL":LEFTHIP,
+	"hipR":RIGHTHIP,
+}
