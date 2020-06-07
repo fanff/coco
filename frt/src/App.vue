@@ -47,6 +47,9 @@ export default {
           // JSON responses are automatically parsed.
           //console.log(response)
           this.buttonEnable = true;
+        },(error)=>{
+          console.log(error); 
+          this.buttonEnable = true;
         })
       },
       download:function(){
