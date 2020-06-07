@@ -5,7 +5,7 @@ import logging
 import json
 from pprint import pprint
 import cocoWalker
-from iv import iv,LEFTFEET,RIGHTFEET,LEFTHIP,RIGHTHIP,nam
+from iv import iv,LEFTFEET,RIGHTFEET,LEFTHIP,RIGHTHIP,nameMap
 
 
 def lin_equ(l1, l2):
@@ -17,9 +17,9 @@ def lin_equ(l1, l2):
 
 logging.basicConfig(level=logging.DEBUG)
 
-repeat = 3
+repeat = 2
 
-dursec= 5
+dursec= 8
 
 sleepPause= 10 / float(1000)
 
