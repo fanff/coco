@@ -1,0 +1,8 @@
+flask 
+flask-socketio
+flask-cors
+numpy
+adafruit-circuitpython-servokit
+#adafruit-circuitpython-pca9685
+#Adafruit-PCA9685
+websockets
