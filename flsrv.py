@@ -15,19 +15,18 @@ from iv import iv,LEFTFEET,RIGHTFEET,LEFTHIP,RIGHTHIP,nameMap
 
 class ServoMockup():
     def __setattr__(self,thing,value):
-        logging.debug("setting %s : %s"%(thing,value))
+        logging.info("setting %s : %s"%(thing,value))
 class SKitMockup():
     def __init__(self):
         self.servo = [ServoMockup() for i in range(16)]
 
 
 async def hello(websocket, path):
-    name = await websocket.recv()
-    print(f"< {name}")
-    greeting = f"Hello {name}!"
-    await websocket.send(greeting)
-    print(f"> {greeting}")
-
+    log = logging.getLogger("handler")
+    while True:
+        name = await websocket.recv()
+        data = json.loads(name)
+        log.info(data)
 
 def posgen(d,freq = .5, phase = .25,ampl=1,shift=0.3):
     return np.sin(freq*(d*2*np.pi + 2*np.pi*phase))*(ampl/2)+shift
@@ -58,22 +57,26 @@ async def bgjob():
     scales = [80,80,-64,-64]
     while True:
         now = time.time()
-        
-        motpos = {k:posgen(now,**v) for k,v in forward().items()}
+        freqfact=1.0
+        amplfact=1.0
+        signdef = forward(freqfact,amplfact)
+        motpos = {k:posgen(now,**v) for k,v in signdef.items()}
         for motname,pos in motpos.items():
 
             motid=nameMap[motname]
             rot = pos*scales[motid]
             coco.setRot(motid,rot)
 
-        sleepdur = .01-(time.time()-now)
+        sleepdur = .31-(time.time()-now)
         if sleepdur>0:
             await asyncio.sleep(sleepdur)
         else:
             print(".")
 
+
+
 logging.basicConfig(level=logging.INFO)
-start_server = websockets.serve(hello, "localhost", 8765)
+start_server = websockets.serve(hello, "0.0.0.0", 8765)
 
 asyncio.get_event_loop().run_until_complete(start_server)
 asyncio.get_event_loop().run_until_complete(bgjob())

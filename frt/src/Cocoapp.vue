@@ -1,5 +1,14 @@
 <template>
   <div id="app">
+      <h1 v-if="connected">:)</h1>
+      <h1 v-else>😢 </h1>
+        
+      <div class="slidecontainer">
+          lol ?
+          <input type="range" min="-1" max="1" v-model="sval" step=".1" class="slider" >
+          <label>{{sval}} </label>
+      </div>
+      <button v-on:click="tbtn()">lol</button>
   </div>
 </template>
 
@@ -10,10 +19,11 @@ export default {
   name: 'App',
   data:function () {
     return {
-      ps:{},
+      connection:false,
+      connected:false,
       txt:"",
       mouseXpos:-1,
-
+      sval:0,
       buttonEnable:true,
     }
   },
@@ -24,12 +34,16 @@ export default {
       updatedMouse: function (event) {
         this.mouseXpos = event
       },
-      gup: function (event) {
-
-        this.ps[event.mot] = event.p
-
-        this.txt = JSON.stringify(this.ps)
-    
+      onmessage:function(){
+          console.log("got message !");
+        
+      },
+      onopen:function(){
+        this.connected=true;
+      },
+      tbtn:function(){
+          console.log("tbns!");
+          this.connection.send("hello coco");
       },
       testbtn:function(){
         this.buttonEnable = false;
@@ -50,7 +64,33 @@ export default {
         link.setAttribute('download', 'file.json') //or any other extension
         document.body.appendChild(link)
         link.click()
+      },
+      sendCommands(){
+        if(this.connected){
+            this.connection.send(JSON.stringify({a:this.sval}))
+        }
       }
+  },
+  watch:{
+    sval:function(){
+        this.sendCommands()
+    }
+  },
+  created: function(){
+    this.connection = new WebSocket("ws://192.168.1.58:8765");
+
+    this.connection.onmessage = this.onmessage;
+
+    this.connection.onopen = this.onopen;
+    this.connection.onclose = function(){
+        console.log("close!");
+        this.connected=false;
+    }
+
+  },
+
+  beforeDestroy: function(){
+
   }
 }
 </script>
