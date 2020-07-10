@@ -20,13 +20,23 @@ class SKitMockup():
     def __init__(self):
         self.servo = [ServoMockup() for i in range(16)]
 
+instantConfig={
+        "freqfact":0.0,
+        "amplfact":0.0
+        }
+
+currentConfig=instantConfig
 
 async def hello(websocket, path):
     log = logging.getLogger("handler")
+    global instantConfig
     while True:
         name = await websocket.recv()
         data = json.loads(name)
-        log.info(data)
+        instantConfig = {k:float(v) for k,v in data.items()}
+        log.info(instantConfig)
+        
+
 
 def posgen(d,freq = .5, phase = .25,ampl=1,shift=0.3):
     return np.sin(freq*(d*2*np.pi + 2*np.pi*phase))*(ampl/2)+shift
@@ -53,21 +63,29 @@ async def bgjob():
     coco.setAtIv()
     time.sleep(.5)
 
-
+    global currentConfig
+    gamma = .20
+    log.info("OP!")
     scales = [80,80,-64,-64]
     while True:
         now = time.time()
-        freqfact=1.0
-        amplfact=1.0
+        #log.info("instantConfig : %s",instantConfig)
+        currentConfig = { k:(v*gamma+(float(instantConfig[k])*(1-gamma))) for k,v in currentConfig.items()}
+        #log.info("currentConfig : %s",currentConfig)
+        freqfact=float(currentConfig["freqfact"])
+        amplfact=float(currentConfig["amplfact"])
+
         signdef = forward(freqfact,amplfact)
         motpos = {k:posgen(now,**v) for k,v in signdef.items()}
+
+        #log.info("motpos : %s",motpos)
         for motname,pos in motpos.items():
 
             motid=nameMap[motname]
             rot = pos*scales[motid]
             coco.setRot(motid,rot)
 
-        sleepdur = .31-(time.time()-now)
+        sleepdur = .05-(time.time()-now)
         if sleepdur>0:
             await asyncio.sleep(sleepdur)
         else:

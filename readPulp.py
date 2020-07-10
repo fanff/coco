@@ -17,9 +17,9 @@ def lin_equ(l1, l2):
 
 logging.basicConfig(level=logging.DEBUG)
 
-repeat = 2
+repeat = 4
 
-dursec= 8
+dursec= 3
 
 sleepPause= 10 / float(1000)
 
