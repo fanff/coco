@@ -30,11 +30,11 @@ Neutral / home angles and motor names are defined in `iv.py`:
                                     ServoKit (or mock)
 ```
 
-1. **`cocoWalker.py`** — Core motion layer. A background thread smoothly interpolates each servo toward target angles.
-2. **`flsrv.py`** — Real-time walker. Sine-based forward gait on **port 8765**; accepts JSON (`freqfact`, `amplfact`) over WebSocket. Uses ServoKit when available, otherwise a mock.
-3. **`readPulp.py`** — Plays back keyframe curves from `file.json` (or UI exports).
-4. **`patterns/`** — Example gait JSON (`forward.json`, `rotateCW.json`, …).
-5. **`frt/`** — Vue 2 UI to draw leg curves per motor, export `file.json`, and connect over WebSocket. Set the host IP in the Vue sources to your board’s LAN address.
+1. **`cocoWalker.py`** — Core motion layer. A background thread smoothly interpolates each servo toward target angles; `move()` and `setRot()` update targets without blocking the gait loop.
+2. **`flsrv.py`** — Real-time walker. Sine-based forward gait on **port 8765**; accepts JSON (`freqfact`, `amplfact`) over WebSocket to adjust speed and amplitude. Uses ServoKit when available, otherwise a mock.
+3. **`readPulp.py`** — Plays back keyframe curves from `file.json` (or UI exports), samples them with linear segments, and replays the motion a configurable number of times.
+4. **`patterns/`** — Example gait JSON (`forward.json`, `rotateCW.json`, …) with time-series points per leg.
+5. **`frt/`** — Vue 2 UI (`cocoui`) to draw leg curves per motor, export `file.json`, and connect over WebSocket. Set the host IP in the Vue sources to your board’s LAN address.
 
 ## Setup (uv)
 
@@ -84,6 +84,7 @@ npm run serve
 - **Flask** packages are listed for experiments; the main control path uses **asyncio** and **websockets** in `flsrv.py`.
 - **Adafruit ServoKit** only talks to real hardware on supported boards (e.g. Raspberry Pi with I2C). Off-device, `flsrv.py` falls back to a mock.
 - The UI references a LAN IP (e.g. `192.168.1.58`); change it to match your robot host.
+- `flsrv.py` accepts WebSocket messages as JSON with numeric fields such as `freqfact` and `amplfact` to tune the live gait.
 
 ## License
 
