@@ -1,23 +1,24 @@
 # Coco Walker
 
-Software for **Coco**, a small quadruped walking robot with four hobby servos (left/right feet and hips). The repo drives motion on a Raspberry Pi (or similar) using an [Adafruit ServoKit](https://www.adafruit.com/product/2327) (PCA9685), and includes tools to design gaits, run them live, and control the robot from a browser.
+Software for **Coco**, a small **bipedal** walking robot. Coco has **two legs** and is driven by **four hobby servos**—a foot and a hip on each side (see `iv.py`). The repo runs on a Raspberry Pi (or similar) with an [Adafruit ServoKit](https://www.adafruit.com/product/2327) (PCA9685), and includes tools to design gaits, run them live, and control the robot from a browser.
 
 Python dependencies are managed with **[uv](https://docs.astral.sh/uv/)** (`pyproject.toml` + `uv.lock`).
 
 ## Hardware
 
-- **4 servos**: feet L/R, hips L/R (channel mapping in `iv.py`)
+- **Biped**: two legs, four degrees of freedom total
+- **4 servos** (2 per leg): foot + hip on left and right (channel mapping in `iv.py`)
 - **Servo driver**: Adafruit ServoKit (16-channel PCA9685 board)
 - **3D-printed parts**: STL models in `3dmodels/` (`body.stl`, `leg.stl`, `feet.stl`)
 
 Neutral / home angles and motor names are defined in `iv.py`:
 
-| Name   | Index | Role        |
-|--------|-------|-------------|
-| feetL  | 0     | Left foot   |
-| feetR  | 1     | Right foot  |
-| hipR   | 2     | Right hip   |
-| hipL   | 3     | Left hip    |
+| Name   | Index | Leg   | Joint   |
+|--------|-------|-------|---------|
+| feetL  | 0     | Left  | Foot    |
+| feetR  | 1     | Right | Foot    |
+| hipR   | 2     | Right | Hip     |
+| hipL   | 3     | Left  | Hip     |
 
 ## How it works
 
@@ -33,7 +34,7 @@ Neutral / home angles and motor names are defined in `iv.py`:
 2. **`flsrv.py`** — Real-time walker. Sine-based forward gait on **port 8765**; accepts JSON (`freqfact`, `amplfact`) over WebSocket. Uses ServoKit when available, otherwise a mock.
 3. **`readPulp.py`** — Plays back keyframe curves from `file.json` (or UI exports).
 4. **`patterns/`** — Example gait JSON (`forward.json`, `rotateCW.json`, …).
-5. **`frt/`** — Vue 2 UI to draw leg curves, export `file.json`, and connect over WebSocket. Set the host IP in the Vue sources to your board’s LAN address.
+5. **`frt/`** — Vue 2 UI to draw leg curves per motor, export `file.json`, and connect over WebSocket. Set the host IP in the Vue sources to your board’s LAN address.
 
 ## Setup (uv)
 
