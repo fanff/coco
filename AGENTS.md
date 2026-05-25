@@ -4,7 +4,7 @@ Guidance for AI agents and automated tooling working in this repository.
 
 ## Project summary
 
-**Coco Walker** is control software for **Coco**, a small **bipedal** robot with **four hobby servos** (left/right foot and hip). The stack runs on a **Raspberry Pi** (or similar) with an **Adafruit ServoKit** (PCA9685, 16 channels) and optional **Vue 2** web UI for gait design.
+**Coco Walker** is control software for **Coco**, a small **bipedal** robot with **four hobby servos** (left/right foot and hip). The stack runs on a **Raspberry Pi Zero W** with an **Adafruit ServoKit** (PCA9685, 16 channels) and optional **Vue 2** web UI for gait design.
 
 - **Repo**: [fanff/coco](https://github.com/fanff/coco) on GitHub
 - **Python**: 3.10+ via [uv](https://docs.astral.sh/uv/) (`pyproject.toml`, `uv.lock`)
@@ -42,12 +42,14 @@ Gait code applies per-motor scales in `flsrv.py` / `readPulp.py`: `[80, 80, -64,
 
 ## Hardware (do not assume in CI)
 
-- **Board**: Raspberry Pi + Adafruit 16-channel PWM/Servo HAT (PCA9685)
+- **Board**: **Raspberry Pi Zero W** + Adafruit 16-channel PWM/Servo HAT (PCA9685)
 - **Servos**: 4× hobby servos; angles clamped 0–180° in `cocoWalker.py`
-- **Power**: Pi on its own 5 V supply; servos on HAT **5–6 V** terminal (separate high-current rail). Not documented in code—see README and Adafruit HAT docs.
+- **Power** (two rails, common ground; see README):
+  - **Pi Zero W**: **5 V, ~1 A**
+  - **Servo bus** (HAT V+/GND): **5–6 V, 2–4 A** (prefer **3–4 A** for walking)
 - **Off-device**: `flsrv.py` catches import failures and uses `SKitMockup` / `ServoMockup` so gait logic runs without hardware.
 
-Enable I2C on the Pi before using real `ServoKit`.
+Enable I2C on the Pi Zero W before using real `ServoKit`. Do not document generic “any Pi” as the target board unless the user changes hardware.
 
 ## Commands agents should use
 

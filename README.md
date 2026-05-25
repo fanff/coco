@@ -6,10 +6,22 @@ Python dependencies are managed with **[uv](https://docs.astral.sh/uv/)** (`pypr
 
 ## Hardware
 
+- **Computer**: Raspberry Pi Zero W (I2C enabled for the servo HAT)
 - **Biped**: two legs, four degrees of freedom total
 - **4 servos** (2 per leg): foot + hip on left and right (channel mapping in `iv.py`)
 - **Servo driver**: Adafruit ServoKit (16-channel PCA9685 board)
 - **3D-printed parts**: STL models in `3dmodels/` (`body.stl`, `leg.stl`, `feet.stl`)
+
+### Power
+
+Use **two supplies** (common ground between Pi and HAT; do not power four servos from the Pi’s 5 V pin):
+
+| Rail | Typical supply | Notes |
+|------|----------------|--------|
+| **Pi Zero W** | **5 V, ~1 A** | Enough for Wi‑Fi and gait software; use a bit more headroom if you add USB peripherals. |
+| **Servo bus** (HAT screw terminals) | **5–6 V, 2–4 A** | **2 A** for light duty with small hobby servos; **3–4 A** safer when all four move or stall during walking. |
+
+Servos must be **5 V–compatible**; PWM logic is **3.3 V** from the Pi. See the [Adafruit Servo HAT guide](https://learn.adafruit.com/adafruit-16-channel-pwm-servo-hat-for-raspberry-pi) for wiring.
 
 Neutral / home angles and motor names are defined in `iv.py`:
 
