@@ -1,11 +1,11 @@
 
-from adafruit_servokit import ServoKit
 import time
 import logging
 import json
 from pprint import pprint
 import cocoWalker
 from iv import iv,LEFTFEET,RIGHTFEET,LEFTHIP,RIGHTHIP,nameMap
+from servo_kit import make_servo_kit
 
 
 def lin_equ(l1, l2):
@@ -69,7 +69,7 @@ for _ in range(int(sampling)):
 # play sampledPos
 scales = [80,80,-64,-64]
 
-kit = ServoKit(channels=16)
+kit = make_servo_kit()
 coco = cocoWalker.CocoWalker(kit,iv)
 coco.setAtIv()
 
