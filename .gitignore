@@ -85,6 +85,9 @@ ipython_config.py
 
 # pyenv (project pins Python via .python-version for uv)
 
+# Generated OpenSCAD meshes
+3dmodels/stl/
+
 # uv
 .uv/
 
