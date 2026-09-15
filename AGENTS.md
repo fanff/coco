@@ -4,7 +4,7 @@ Guidance for AI agents and automated tooling working in this repository.
 
 ## Project summary
 
-**Coco Walker** is control software for **Coco**, a small **bipedal** robot with **four hobby servos** (left/right foot and hip). The stack runs on a **Raspberry Pi Zero W** with an **Adafruit ServoKit** (PCA9685, 16 channels) and optional **Vue 2** web UI for gait design.
+**Coco Walker** is control software for **Coco**, a small **bipedal** robot with **four hobby servos** (left/right foot and hip). The stack runs on a **Raspberry Pi Zero W** with **pigpio** PWM on four GPIO lines (`servo_kit.py`), optional **Vue 2** web UI for gait design, and **2S 18650 + BMS** power via dual 5 V BECs.
 
 - **Repo**: [fanff/coco](https://github.com/fanff/coco) on GitHub
 - **Python**: 3.10+ via [uv](https://docs.astral.sh/uv/) (`pyproject.toml`, `uv.lock`)
@@ -17,13 +17,14 @@ frt/ (Vue UI)  --WebSocket-->  flsrv.py (port 8765)
                                     |
                               cocoWalker.py (interpolation thread)
                                     |
-                              ServoKit / mock
+                         servo_kit (pigpio / mock)
 ```
 
 | Component | Role |
 |-----------|------|
 | `cocoWalker.py` | `CocoWalker` class: threaded smooth servo moves; `setRot`, `move`, `setAtIv` |
-| `iv.py` | Home angles `iv=[...]` and motor name → channel map (`nameMap`) |
+| `iv.py` | Home angles `iv=[...]`, `servoGpios`, motor name → index map (`nameMap`) |
+| `servo_kit.py` | `make_servo_kit()`: pigpio, legacy ServoKit, or mock |
 | `flsrv.py` | Live sine gait + WebSocket control (`freqfact`, `amplfact`) |
 | `readPulp.py` | Playback of `file.json` keyframe curves (linear segments) |
 | `patterns/*.json` | Example saved gaits (normalized time `x`, offset `y` per motor) |
@@ -31,25 +32,24 @@ frt/ (Vue UI)  --WebSocket-->  flsrv.py (port 8765)
 
 ### Motor mapping (`iv.py`)
 
-| Name | Channel | Leg | Joint |
-|------|---------|-----|-------|
-| `feetL` | 0 | Left | Foot |
-| `feetR` | 1 | Right | Foot |
-| `hipR` | 2 | Right | Hip |
-| `hipL` | 3 | Left | Hip |
+| Name | Index | GPIO (BCM) | Leg | Joint |
+|------|-------|------------|-----|-------|
+| `feetL` | 0 | 17 | Left | Foot |
+| `feetR` | 1 | 18 | Right | Foot |
+| `hipR` | 2 | 27 | Right | Hip |
+| `hipL` | 3 | 22 | Left | Hip |
 
 Gait code applies per-motor scales in `flsrv.py` / `readPulp.py`: `[80, 80, -64, -64]` multiplied by pattern values before `setRot`.
 
 ## Hardware (do not assume in CI)
 
-- **Board**: **Raspberry Pi Zero W** + Adafruit 16-channel PWM/Servo HAT (PCA9685)
+- **Board**: **Raspberry Pi Zero W**; servos on GPIO via **pigpio** (`pigpiod` must be running)
 - **Servos**: 4× hobby servos; angles clamped 0–180° in `cocoWalker.py`
-- **Power** (two rails, common ground; see README):
-  - **Pi Zero W**: **5 V, ~1 A**
-  - **Servo bus** (HAT V+/GND): **5–6 V, 2–4 A** (prefer **3–4 A** for walking)
-- **Off-device**: `flsrv.py` catches import failures and uses `SKitMockup` / `ServoMockup` so gait logic runs without hardware.
+- **Power**: **2S** protected 18650 pack (**~7.4 V**) → two **5 V BECs** (Pi **~1 A**, servos **3–4 A**), **common ground**
+- **Legacy**: `COCO_SERVO_BACKEND=servokit` for Adafruit PCA9685 HAT (I2C)
+- **Off-device**: `make_servo_kit()` falls back to mock; set `COCO_SERVO_BACKEND=mock` explicitly in CI
 
-Enable I2C on the Pi Zero W before using real `ServoKit`. Do not document generic “any Pi” as the target board unless the user changes hardware.
+Do not document generic “any Pi” as the target board unless the user changes hardware.
 
 ## Commands agents should use
 
@@ -99,7 +99,7 @@ Used by `readPulp.py`, `file.json`, and `patterns/`:
 
 1. **Minimize scope** — Prefer small, focused changes. Do not refactor unrelated Flask experiments unless asked.
 2. **Match existing style** — Plain Python, minimal typing, `logging` for debug, threading in `cocoWalker.py`.
-3. **Preserve motor indices** — Changes to `nameMap` or channel order affect hardware wiring; update README table and any UI motor labels together.
+3. **Preserve motor indices** — Changes to `nameMap`, `servoGpios`, or index order affect wiring; update README GPIO table and any UI motor labels together.
 4. **Run via `uv run`** — Do not assume a global venv; use project lockfile.
 5. **Tests** — No formal test suite; `test.py` is a manual WebSocket check. Add tests only when requested or they cover non-trivial behavior.
 6. **Dependencies** — Edit `pyproject.toml` and run `uv lock` / `uv sync`; commit `uv.lock`.
@@ -113,7 +113,8 @@ Used by `readPulp.py`, `file.json`, and `patterns/`:
 | `cocoWalker.py` | Core motion; thread lifecycle (`startThread` / `stopThread`) |
 | `flsrv.py` | Asyncio + websockets; mock fallback |
 | `readPulp.py` | JSON sampling loop; `repeat`, `dursec`, `sleepPause` at top of file |
-| `iv.py` | Single source for home pose and names |
+| `iv.py` | Home pose, GPIO map, motor names |
+| `servo_kit.py` | pigpio / ServoKit / mock; pulse width mapping |
 | `frt/src/Cocoapp.vue` | WebSocket URL and UI |
 | `frt/src/components/cav.vue` | Canvas gait editor |
 | `README.md` | User-facing docs; keep in sync with behavior changes |
@@ -126,6 +127,7 @@ Used by `readPulp.py`, `file.json`, and `patterns/`:
 | Tune live walk speed/amplitude | `flsrv.py` (`forward`, `scales`, WebSocket keys) |
 | New recorded gait | `patterns/` or UI export → `file.json` |
 | Safer servo limits | `cocoWalker.py` (`nextposcapped` clamp) |
+| Change GPIO pins | `iv.py` (`servoGpios`) |
 | UI-only work | `frt/` |
 | Deps / Python version | `pyproject.toml`, `.python-version`, `uv.lock` |
 

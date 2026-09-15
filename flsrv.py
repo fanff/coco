@@ -12,13 +12,7 @@ from pprint import pprint
 
 import cocoWalker
 from iv import iv,LEFTFEET,RIGHTFEET,LEFTHIP,RIGHTHIP,nameMap
-
-class ServoMockup():
-    def __setattr__(self,thing,value):
-        logging.info("setting %s : %s"%(thing,value))
-class SKitMockup():
-    def __init__(self):
-        self.servo = [ServoMockup() for i in range(16)]
+from servo_kit import make_servo_kit
 
 instantConfig={
         "freqfact":0.0,
@@ -52,12 +46,7 @@ def forward(freqfact=1,amplfact = 1.0):
 
 async def bgjob():
     log = logging.getLogger("bgjob")
-    try:
-        from adafruit_servokit import ServoKit
-        kit = ServoKit(channels=16)
-    except Exception as e:
-        log.warning("mocking up") 
-        kit = SKitMockup()
+    kit = make_servo_kit(log)
 
     coco = cocoWalker.CocoWalker(kit,iv)
     coco.setAtIv()
