@@ -103,7 +103,7 @@ Used by `readPulp.py`, `file.json`, and `patterns/`:
 4. **Run via `uv run`** — Do not assume a global venv; use project lockfile.
 5. **Tests** — No formal test suite; `test.py` is a manual WebSocket check. Add tests only when requested or they cover non-trivial behavior.
 6. **Dependencies** — Edit `pyproject.toml` and run `uv lock` / `uv sync`; commit `uv.lock`.
-7. **3D assets** — `3dmodels/*.stl` are printable parts; do not binary-edit in agents.
+7. **3D assets** — Printable parts live in `3dmodels/` as OpenSCAD (`.scad`). Do not binary-edit exported STLs; change the `.scad` sources instead.
 8. **Notebook** — `Untitled.ipynb` is experimental; avoid depending on it for production paths.
 
 ## Files agents touch often
@@ -118,6 +118,7 @@ Used by `readPulp.py`, `file.json`, and `patterns/`:
 | `frt/src/Cocoapp.vue` | WebSocket URL and UI |
 | `frt/src/components/cav.vue` | Canvas gait editor |
 | `README.md` | User-facing docs; keep in sync with behavior changes |
+| `3dmodels/` | OpenSCAD biped parts (MG90S); `3dmodels/README.md` |
 
 ## Common tasks
 
@@ -130,6 +131,7 @@ Used by `readPulp.py`, `file.json`, and `patterns/`:
 | Change GPIO pins | `iv.py` (`servoGpios`) |
 | UI-only work | `frt/` |
 | Deps / Python version | `pyproject.toml`, `.python-version`, `uv.lock` |
+| 3D-printed structure | `3dmodels/*.scad` (export STL via OpenSCAD / `make -C 3dmodels stl`) |
 
 ## Pitfalls
 

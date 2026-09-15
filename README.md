@@ -8,9 +8,9 @@ Python dependencies are managed with **[uv](https://docs.astral.sh/uv/)** (`pypr
 
 - **Computer**: Raspberry Pi Zero W
 - **Biped**: two legs, four degrees of freedom total
-- **4 servos** (2 per leg): foot + hip on left and right (mapping in `iv.py`)
+- **4× MG90S servos** (2 per leg): foot + hip on left and right (mapping in `iv.py`)
 - **Servo control**: [pigpio](https://abyz.me.uk/rpi/pigpio/) on four GPIO lines (`servoGpios` in `iv.py`); legacy PCA9685 ServoKit still supported via `servo_kit.py`
-- **3D-printed parts**: STL models in `3dmodels/` (`body.stl`, `leg.stl`, `feet.stl`)
+- **3D-printed parts**: OpenSCAD sources in `3dmodels/` (MG90S biped: left/right feet, left/right legs, base plate). See `3dmodels/README.md`.
 
 ### Power
 
@@ -101,7 +101,7 @@ npm run serve
 | `readPulp.py` | JSON pattern sampler and playback |
 | `patterns/` | Saved gait curves |
 | `frt/` | Vue control / pattern editor UI |
-| `3dmodels/` | Printable robot parts (STL) |
+| `3dmodels/` | OpenSCAD sources for printable MG90S biped parts |
 | `Untitled.ipynb` | Experiments and prototyping |
 
 ## Notes
