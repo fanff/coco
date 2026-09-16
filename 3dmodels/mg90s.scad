@@ -60,6 +60,15 @@ module mg90s_orient_shaft_y(dir = 1, spin = 180) {
                 children();
 }
 
+// Foot servo: 90° about world +Z from the hip Y-shaft pose.
+// Shaft points world −X (backward). Body is laid down in the sole
+// (local width → +Z); the 23 mm body occupies +X (toward the toes).
+module mg90s_orient_foot(spin = 180) {
+    rotate([0, 0, 90])
+        mg90s_orient_shaft_y(dir = 1, spin = spin)
+            children();
+}
+
 module mg90s_body_cube(extra = 0) {
     translate([
         mg90s_body_xmin() - extra,

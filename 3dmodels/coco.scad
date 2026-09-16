@@ -11,28 +11,31 @@ eps = 0.08;
 // --- layout ---
 hip_span     = 72.0;   // hip shaft to hip shaft (Y)
 hip_x        = 36.0;   // hip shafts forward of plate centre
-leg_len      = 56.0;   // hip shaft to ankle shaft (Z)
-ankle_h      = 22.0;   // ankle shaft above ground
+leg_len      = 56.0;   // hip shaft to foot-servo shaft (Z)
 wall         = 3.6;
 clearance    = 0.40;
 
-// --- foot ---
-sole_l       = 64.0;
-sole_w       = 36.0;
-sole_t       = 5.0;
-toe_len      = 36.0;
-heel_len     = 28.0;
-foot_boss_h  = 9.0;
-foot_boss_d  = 26.0;
-sole_cy      = 11.0;   // sole centre in +Y (outboard of the horn plane)
+// --- foot (MG90S laid in the sole, shaft pointing backward / −X) ---
+sole_l       = 76.0;
+sole_w       = 50.0;
+sole_t       = 4.0;
+toe_len      = 50.0;
+heel_len     = 12.0;
+foot_boss_h  = 6.5;
+foot_boss_d  = 22.0;
+ankle_h      = MG90S_BODY_W / 2 + clearance + wall + sole_t;
 
-// --- leg (U-channel, opens outboard toward the horn / +Y) ---
+// Sole sits under the laid-down body (shaft is not at the body centre).
+function coco_foot_sole_x() = 14.0;
+function coco_foot_sole_y() = -(mg90s_body_xmin() + mg90s_body_xmax()) / 2;
+
+// --- leg (U-channel shin; bottom bolts to the foot-servo horn) ---
 hip_flange_d = 26.0;
 hip_flange_h = 6.5;
 u_wall       = 3.6;    // U arm / web thickness
 u_inner_w    = 30.0;   // inside width along X (fore–aft)
 u_inner_d    = 28.0;   // inside depth along −Y (inboard of the horn plane)
-u_below      = 10.0;   // how far the U continues below the ankle shaft
+u_ankle_clear = 18.0;  // U stops this far above the foot-servo shaft
 u_web_top_z  = -14.0;  // web stays below the hip servo body
 
 // --- base plate ---
@@ -132,58 +135,66 @@ module coco_servo_hatch(dir = 1) {
 }
 
 // =====================================================================
-// Foot
-// Origin: ankle shaft. Horn plane at y = 0; plastic in +Y (outboard).
-// The column is a single hull from the horn boss into the sole so the
-// mesh stays one CGAL volume.
+// Foot — MG90S lives in the sole, laid down, shaft pointing backward (−X).
+// Origin: output shaft. Horn plane is YZ at x = 0 (horn toward −X).
+// Body occupies +X (forward). Print sole-down.
 // =====================================================================
 module coco_foot_sole_2d() {
     hull() {
-        translate([toe_len - 9, 0])
-            circle(d = 18);
-        translate([-(heel_len - 8), 0])
+        translate([toe_len - 10, 0])
+            circle(d = 20);
+        translate([-(heel_len - 4), 0])
             circle(d = 16);
-        coco_rounded_rect([sole_l - 10, sole_w - 12], r = 7);
+        coco_rounded_rect([sole_l - 12, sole_w - 10], r = 8);
     }
 }
 
 module coco_foot_positive() {
     sole_z = -ankle_h;
+    sx = coco_foot_sole_x();
+    sy = coco_foot_sole_y();
     union() {
-        translate([0, sole_cy, sole_z])
+        translate([sx, sy, sole_z])
             linear_extrude(sole_t)
                 coco_foot_sole_2d();
-        // Ankle column: horn boss fused into a pad that sits inside the sole.
+        // Cage hulled into a pad that sits inside the sole (overlap → one solid).
         hull() {
-            translate([0, -0.4, 0])
-                rotate([-90, 0, 0])
-                    cylinder(d = foot_boss_d, h = foot_boss_h + 0.4);
-            translate([0, sole_cy, sole_z + 0.8])
-                linear_extrude(sole_t - 0.6)
-                    coco_rounded_rect([32, 22], r = 6);
+            mg90s_orient_foot()
+                coco_servo_cage_solid(pad = wall);
+            translate([sx, sy, sole_z + 0.4])
+                linear_extrude(sole_t - 0.4)
+                    coco_rounded_rect([44, 30], r = 7);
         }
     }
 }
 
 module coco_foot_cuts() {
     sole_z = -ankle_h;
-    rotate([-90, 0, 0])
-        mg90s_horn_cuts(h = foot_boss_h + 8, seat = 1.4);
-    rotate([-90, 0, 0])
-        translate([0, 0, -1])
-            cylinder(d = 3.2, h = foot_boss_h + 12);
-    translate([0, foot_boss_h - 1.6, 0])
-        rotate([-90, 0, 0])
-            cylinder(d1 = 3.4, d2 = 6.5, h = 2.2);
-    translate([0, sole_cy, sole_z])
+    sx = coco_foot_sole_x();
+    sy = coco_foot_sole_y();
+    mg90s_orient_foot()
+        union() {
+            mg90s_pocket(clearance = clearance, extra_shaft = 18, extra_cable = 22);
+            mg90s_tab_screws(d = 2.2, h = 36);
+            coco_servo_hatch(dir = 1);
+        }
+    // Open the heel above the sole so the shin flange can sit on the horn.
+    translate([-12, 0, 6])
+        cube([24, foot_boss_d + 10, 32], center = true);
+    // Zip-tie across the foot (world Y), under the body.
+    translate([mg90s_horn_z() * 0.45, sy, -MG90S_BODY_W / 2 - 0.8])
+        rotate([90, 0, 0])
+            cylinder(d = 3.4, h = sole_w + 12, center = true);
+    // Inset tread on the sole, fully inside the outline.
+    translate([sx, sy, sole_z])
         intersection() {
             translate([0, 0, -0.2])
-                linear_extrude(2.2)
+                linear_extrude(2.0)
                     offset(-6)
                         coco_foot_sole_2d();
-            for (x = [-18, -6, 6, 18])
-                translate([x, 0, 0.9])
-                    cube([3.2, 16, 1.8], center = true);
+            for (x = [-10, 4, 18, 32])
+                translate([x, 0, 0.85])
+                    cube([3.2, 24, 1.8], center = true);
         }
 }
 
@@ -193,17 +204,20 @@ module coco_foot(side = 1) {
             coco_foot_positive();
         mirror([0, side < 0 ? 1 : 0, 0])
             coco_foot_cuts();
-        translate([24, side * sole_cy, -ankle_h + sole_t - 1.5])
-            coco_stamp_lr(side, h = 2.0);
+        translate([
+            coco_foot_sole_x() + toe_len - 16,
+            coco_foot_sole_y() + side * 10,
+            -ankle_h + sole_t - 1.2
+        ])
+            coco_stamp_lr(side, h = 1.5);
     }
 }
 
 // =====================================================================
 // Leg — U-channel shin
 // Origin: hip shaft, horn plane at y = 0.
-// The U opens outboard (+Y) so the ankle MG90S is visible in the
-// assembly drawing. Front and rear arms run inboard; a web closes the
-// inboard side. Hip round-horn flange sits on the outboard rim.
+// The U opens outboard (+Y). Bottom of the shin is a round-horn flange
+// facing −X, which bolts onto the foot servo (shaft pointing backward).
 // =====================================================================
 function coco_u_x_inner() = u_inner_w / 2;
 function coco_u_y_web() = -(u_inner_d + u_wall);
@@ -221,18 +235,16 @@ module coco_leg_u_2d() {
 }
 
 module coco_leg_positive() {
-    z_bot = -leg_len - u_below;
+    z_bot = -leg_len + u_ankle_clear;
     u_h = -z_bot + u_web_top_z + 2;
     union() {
         // Hip horn flange (plastic outboard of the hip horn).
         rotate([-90, 0, 0])
             cylinder(d = hip_flange_d, h = hip_flange_h);
-        // U-channel from below the hip servo down past the ankle.
+        // U-channel from below the hip servo, stopping above the foot.
         translate([0, 0, z_bot])
             linear_extrude(u_h)
                 coco_leg_u_2d();
-        // Neck: hip flange fused onto the outboard rim of the U
-        // (cube overlaps the U by 2 mm so CGAL unions them).
         hull() {
             translate([0, 0.4, 0])
                 rotate([-90, 0, 0])
@@ -244,13 +256,24 @@ module coco_leg_positive() {
             ])
                 cube([u_inner_w + 2 * u_wall, 7, 8]);
         }
-        // Closed bottom of the U, overlapping the channel.
-        translate([
-            -(coco_u_x_inner() + u_wall),
-            coco_u_y_web(),
-            z_bot - 0.2
-        ])
-            cube([u_inner_w + 2 * u_wall, u_inner_d + u_wall, u_wall + 2]);
+        // Foot-servo horn flange: disk in YZ, plastic toward −X (behind the horn).
+        translate([0, 0, -leg_len])
+            rotate([0, -90, 0])
+                cylinder(d = foot_boss_d, h = foot_boss_h);
+        // Rear slab from the U web to the horn, occupying the heel notch.
+        translate([-foot_boss_h, coco_u_y_web(), -leg_len - 8])
+            cube([foot_boss_h, -coco_u_y_web() + 3, 16]);
+        // Fuse the slab into the rear of the U (overlap the rear arm).
+        hull() {
+            translate([-foot_boss_h, coco_u_y_web(), -leg_len + 6])
+                cube([foot_boss_h, u_wall + 2, 4]);
+            translate([
+                -(coco_u_x_inner() + u_wall),
+                coco_u_y_web(),
+                z_bot
+            ])
+                cube([u_wall + 3, u_wall + 2, 5]);
+        }
     }
 }
 
@@ -264,20 +287,23 @@ module coco_leg_cuts() {
     translate([0, hip_flange_h - 1.5, 0])
         rotate([-90, 0, 0])
             cylinder(d1 = 3.4, d2 = 6.5, h = 2.0);
-    // Ankle servo sits in the U. extra_shaft opens the horn toward +Y.
+    // Foot-servo horn seat, facing −X (matches mg90s_orient_foot).
     translate([0, 0, -leg_len])
-        mg90s_orient_shaft_y(1)
-            union() {
-                mg90s_pocket(clearance = clearance, extra_shaft = 14);
-                mg90s_tab_screws(d = 2.2, h = 40);
-            }
-    // Cable slot through the rear arm (world −X).
-    translate([-coco_u_x_inner() - u_wall - 1, -10, -leg_len])
+        rotate([0, -90, 0])
+            mg90s_horn_cuts(h = 22, seat = 1.4);
+    translate([0, 0, -leg_len])
+        rotate([0, -90, 0])
+            translate([0, 0, -1])
+                cylinder(d = 3.2, h = foot_boss_h + 10);
+    translate([-foot_boss_h + 1.5, 0, -leg_len])
+        rotate([0, -90, 0])
+            cylinder(d1 = 3.4, d2 = 6.5, h = 2.0);
+    // Flatten the ankle flange so it stays above the sole.
+    translate([0, 0, -leg_len - 40 - 9])
+        cube([50, 50, 80], center = true);
+    // Cable slot through the rear arm, down toward the foot servo.
+    translate([-coco_u_x_inner() - u_wall / 2, -10, -leg_len + u_ankle_clear + 8])
         cube([u_wall + 4, 8, 6], center = true);
-    // Zip-tie through both arms, below the body.
-    translate([0, -u_inner_d * 0.45, -leg_len - (MG90S_BODY_W / 2 + 1.0)])
-        rotate([0, 90, 0])
-            cylinder(d = 3.4, h = u_inner_w + 2 * u_wall + 8, center = true);
 }
 
 module coco_leg(side = 1) {
@@ -286,7 +312,6 @@ module coco_leg(side = 1) {
             coco_leg_positive();
         mirror([0, side < 0 ? 1 : 0, 0])
             coco_leg_cuts();
-        // L/R on the front (+X) arm, readable from the front of the robot.
         translate([
             coco_u_x_inner() + u_wall + 0.15,
             side * (-u_inner_d * 0.45),

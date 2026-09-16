@@ -1,12 +1,13 @@
 // Coco — assembled preview (not a printable part).
 // Opens in OpenSCAD F5 to check fit: 4× MG90S, two U-shaped legs, two feet, deck.
-// Default camera looks in from the left so the U-channel is visible.
+// Default camera looks in from the rear-left so the in-foot motors are visible
+// (laid down in the green soles, shafts pointing backward).
 
 include <coco.scad>
 
-$vpr = [70, 0, 32];
-$vpt = [hip_x, 0, coco_hip_z_world() * 0.35];
-$vpd = 300;
+$vpr = [68, 0, 148];
+$vpt = [hip_x - 8, 0, coco_hip_z_world() * 0.28];
+$vpd = 290;
 
 module coco_hip_servo(side) {
     translate([hip_x, coco_hip_y(side), coco_hip_z_world()])
@@ -14,10 +15,11 @@ module coco_hip_servo(side) {
             mg90s_dummy();
 }
 
-module coco_ankle_servo(side) {
+module coco_foot_servo(side) {
     translate([hip_x, coco_hip_y(side), ankle_h])
-        mg90s_orient_shaft_y(side)
-            mg90s_dummy();
+        mirror([0, side < 0 ? 1 : 0, 0])
+            mg90s_orient_foot()
+                mg90s_dummy();
 }
 
 module coco_assembly(exploded = 0) {
@@ -35,7 +37,7 @@ module coco_assembly(exploded = 0) {
             color(s > 0 ? "Tomato" : "Orange")
                 coco_leg(s);
 
-        coco_ankle_servo(s);
+        coco_foot_servo(s);
 
         translate([hip_x, coco_hip_y(s), ankle_h - e * 16])
             color(s > 0 ? "YellowGreen" : "OliveDrab")
