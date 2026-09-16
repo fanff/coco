@@ -42,7 +42,7 @@ Each hip servo lives in a well on the base. The matching **leg** bolts onto the 
 
 Each **foot** servo lives *in the sole* (the green part in `assembly.scad`), laid down so the 12.4 mm body width is vertical. That pose is the hip Y-shaft orientation turned **90° about +Z**: the output shaft points **backward** (−X), the 23 mm body occupies +X (toward the toes), and the round horn sticks out the heel. The well is sliced by a horizontal plane at the **motor top**, so there is no roof or wall above the servo — it slides in from above. A **notch from the top** of the outboard wall lets the servo lead pass through as the motor drops in.
 
-The ground plate is a compact **gnome foot**: four toes in front (big toe inboard), only a little margin around the motor in X/Y, and a **short heel** so the shin flange still clears at the back. Well walls may rise in Z around the motor and a bit toward the front. The bottom of the shin is a horn flange that bolts onto that horn, so commanding `feetL` / `feetR` pitches the foot. Left and right parts are mirrors; soles are stamped **L** / **R** on the big toe.
+The ground plate is a compact **gnome foot**: four overlapping flattened-sphere toes in front (big toe inboard, the balls collide so they are not split fingers), only a little margin around the motor in X/Y, and a **short heel** so the shin flange still clears at the back. Well walls may rise in Z around the motor and a bit toward the front. The bottom of the shin is a horn flange that bolts onto that horn, so commanding `feetL` / `feetR` pitches the foot. Left and right parts are mirrors; soles are stamped **L** / **R** on the big toe.
 
 Default layout in `coco.scad` (edit these to retune stance):
 
@@ -51,7 +51,7 @@ Default layout in `coco.scad` (edit these to retune stance):
 | `hip_span` | 72 mm | Hip shaft to hip shaft (Y) |
 | `leg_len` | 56 mm | Hip shaft to foot-servo shaft (Z) |
 | `ankle_h` | 14.2 mm | Foot-servo shaft above the ground (`BODY_W/2 + clearance + wall + sole_t`) |
-| `toe_reach` | 51 mm | Gnome-toe tip, forward of the foot-servo shaft |
+| `toe_reach` | 43 mm | Forward-most toe-ball centre, from the foot-servo shaft |
 | `heel_lip` | 2 mm | Sole behind the shaft (kept short for the shin) |
 | `u_inner_w` × `u_inner_d` | 30 × 28 mm | U-channel inside (X × Y) |
 | `u_wall` | 3.6 mm | U arm / web thickness |
