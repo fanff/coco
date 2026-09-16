@@ -28,6 +28,9 @@ ankle_h      = MG90S_BODY_W / 2 + clearance + wall + sole_t;
 // Sole sits under the laid-down body (shaft is not at the body centre).
 function coco_foot_sole_x() = 14.0;
 function coco_foot_sole_y() = -(mg90s_body_xmin() + mg90s_body_xmax()) / 2;
+// Laid-down motor top (world +Z). Everything above this plane is cut away
+// so the servo can slide into the well from above.
+function coco_foot_motor_top_z() = MG90S_BODY_W / 2;
 
 // --- leg (U-channel shin; bottom bolts to the foot-servo horn) ---
 hip_flange_d = 26.0;
@@ -138,6 +141,8 @@ module coco_servo_hatch(dir = 1) {
 // Foot — MG90S lives in the sole, laid down, shaft pointing backward (−X).
 // Origin: output shaft. Horn plane is YZ at x = 0 (horn toward −X).
 // Body occupies +X (forward). Print sole-down.
+// The well is sliced at the motor top (world +Z = BODY_W/2) so the servo
+// slides in from above; nothing green sits above that plane.
 // =====================================================================
 module coco_foot_sole_2d() {
     hull() {
@@ -176,8 +181,10 @@ module coco_foot_cuts() {
         union() {
             mg90s_pocket(clearance = clearance, extra_shaft = 18, extra_cable = 22);
             mg90s_tab_screws(d = 2.2, h = 36);
-            coco_servo_hatch(dir = 1);
         }
+    // Slice at the motor top: remove all green plastic above this plane.
+    translate([0, 0, coco_foot_motor_top_z() + 50])
+        cube([200, 200, 100], center = true);
     // Open the heel above the sole so the shin flange can sit on the horn.
     translate([-12, 0, 6])
         cube([24, foot_boss_d + 10, 32], center = true);
