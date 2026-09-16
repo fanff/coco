@@ -173,14 +173,28 @@ module coco_foot_positive() {
     }
 }
 
+// Open-top slot at the cable end so the lead drops in with the servo.
+// Local +Y is world +Z after mg90s_orient_foot, so the cube runs up
+// through the motor-top plane and out the wall (local −X / outboard).
+module coco_foot_wire_notch() {
+    nw = 8.0;
+    translate([
+        mg90s_body_xmin() - 28,
+        -4.0,
+        -1.0
+    ])
+        cube([32, 24, nw]);
+}
+
 module coco_foot_cuts() {
     sole_z = -ankle_h;
     sx = coco_foot_sole_x();
     sy = coco_foot_sole_y();
     mg90s_orient_foot()
         union() {
-            mg90s_pocket(clearance = clearance, extra_shaft = 18, extra_cable = 22);
+            mg90s_pocket(clearance = clearance, extra_shaft = 18, extra_cable = 4);
             mg90s_tab_screws(d = 2.2, h = 36);
+            coco_foot_wire_notch();
         }
     // Slice at the motor top: remove all green plastic above this plane.
     translate([0, 0, coco_foot_motor_top_z() + 50])
