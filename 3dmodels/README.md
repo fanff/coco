@@ -39,7 +39,18 @@ Two degrees of freedom per leg, matching `iv.py` (`feetL` / `feetR` / `hipL` / `
                     +X forward
 ```
 
-Each hip servo lives in a well on the base. The matching **leg** bolts onto the stock round horn. Each **foot** bolts onto the ankle servo’s round horn. Left and right parts are mirrors; they are stamped **L** / **R**.
+Each hip servo lives in a well on the base. The matching **leg** bolts onto the stock round horn. A **16 mm pipe** runs down the outboard side of the shin (clear of the hip screw) and is fused into the ankle cage. Each **foot** bolts onto the ankle servo’s round horn. Left and right parts are mirrors; soles are stamped **L** / **R** on the toe.
+
+Default layout in `coco.scad` (edit these to retune stance):
+
+| Parameter | Default | Meaning |
+|-----------|---------|---------|
+| `hip_span` | 72 mm | Hip shaft to hip shaft (Y) |
+| `leg_len` | 52 mm | Hip shaft to ankle shaft (Z) |
+| `ankle_h` | 22 mm | Ankle shaft above the ground |
+| `sole_l` × `sole_w` | 64 × 36 mm | Footprint |
+| `boom_d` | 16 mm | Shin pipe outer diameter |
+| `clearance` | 0.40 mm | MG90S pocket clearance |
 
 ## Bill of materials (hardware)
 
@@ -77,17 +88,19 @@ Or: `make stl`. Open `assembly.scad` and press **F5** to inspect the fit before 
 
 Suggested bed orientation (already applied in the printable files):
 
-- **Feet** — sole on the bed
-- **Legs** — inboard (horn) face on the bed
+- **Feet** — sole on the bed. Ankle column and horn boss print upward; no supports.
+- **Legs** — inboard cage wall toward the bed, boom along the printer Y (`coco_leg_print` already rotates and lifts the mesh). Light supports only if the ankle-cage overhang sags.
 - **Base plate** — floor on the bed, wells facing up
+
+Each foot and each leg exports as **one printable shell** (no floating chips). The shin pipe has an open cable duct from the ankle pocket to a rear exit under the hip flange.
 
 ## Assembly
 
 1. Drop the two **hip** MG90S units into the base wells, cables toward the Pi. Tabs sit in the side slots; optional M2 screws through the tab holes. Shafts point **outboard**.
 2. Fit a round horn on each hip. Bolt `leg_left` / `leg_right` onto those horns (horn screw through the printed flange).
-3. Drop an MG90S into each shin cage, shaft outboard. Zip-tie through the slot if you are not using tab screws.
-4. Fit round horns on the ankle servos. Bolt the matching feet on (L / R labels on the soles).
+3. Drop an MG90S into each shin cage, shaft outboard. Zip-tie through the hole below the body if you are not using tab screws. Feed the ankle lead into the pipe duct and out the rear hole under the hip flange.
+4. Fit round horns on the ankle servos. Bolt the matching feet on (**L** / **R** stamps on the toes).
 5. Mount the Pi Zero W on the four standoffs (USB/HDMI toward the rear). Strap the 2S pack under the deck. Sit the BECs on the raised pads. Route foot-servo wires up the boom ducts and through the rim holes next to each hip.
 6. Home angles and GPIO are still those in `iv.py`; power the servo rail from the 3–4 A BEC, not from the Pi 5 V pin.
 
-Tune `clearance` in `coco.scad` if a clone body is tight or sloppy. Tune `hip_span`, `leg_len`, and `ankle_h` there if you change stance or shin length.
+Tune `clearance` in `coco.scad` if a clone body is tight or sloppy. Tune `hip_span`, `leg_len`, `ankle_h`, `sole_l`, and `boom_d` there if you change stance, footprint, or shin length.

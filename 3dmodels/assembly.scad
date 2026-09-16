@@ -38,4 +38,5 @@ module coco_assembly(exploded = 0) {
     }
 }
 
-coco_assembly(exploded = 0);
+exploded = 0; // set to 1 for an exploded preview
+coco_assembly(exploded = exploded);
