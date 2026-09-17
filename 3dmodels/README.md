@@ -42,7 +42,7 @@ Each hip servo lives in a well on the base. The matching **leg** bolts onto the 
 
 Each **foot** servo lives *in the sole* (the green part in `assembly.scad`), laid down so the 12.4 mm body width is vertical. That pose is the hip Y-shaft orientation turned **90° about +Z**: the output shaft points **backward** (−X), the 23 mm body occupies +X (toward the toes), and the round horn sticks out the heel. The well is sliced by a horizontal plane at the **motor top**, so there is no roof or wall above the servo — it slides in from above. A **notch from the top** of the outboard wall lets the servo lead pass through as the motor drops in.
 
-The ground plate is a compact **gnome foot**: four overlapping flattened-sphere toes in front (big toe inboard, the balls collide so they are not split fingers), only a little margin around the motor in X/Y, and a **short heel** so the shin flange still clears at the back. Well walls may rise in Z around the motor and a bit toward the front. The bottom of the shin is a horn flange that bolts onto that horn, so commanding `feetL` / `feetR` pitches the foot. Left and right parts are mirrors; soles are stamped **L** / **R** on the big toe.
+The ground plate is a compact **gnome foot**: four overlapping flattened-sphere toes in front (the balls collide so they are not split fingers), a **narrow** pad around the motor in Y, and a **short heel** so the shin flange still clears at the back. Well walls may rise in Z around the motor and a bit toward the front. The bottom of the shin is a horn flange that bolts onto that horn, so commanding `feetL` / `feetR` pitches the foot. Left and right parts are mirrors.
 
 Default layout in `coco.scad` (edit these to retune stance):
 
@@ -105,7 +105,7 @@ Each foot and each leg exports as **one printable shell** (no floating chips). T
 1. Drop the two **hip** MG90S units into the base wells, cables toward the Pi. Tabs sit in the side slots; optional M2 screws through the tab holes. Shafts point **outboard**.
 2. Fit a round horn on each hip. Bolt `leg_left` / `leg_right` onto those horns (horn screw through the printed flange).
 3. Slide an MG90S into each **foot** well from above, body laid down, shaft pointing **backward** (out the heel). The well has no roof — it is cut off at the motor top. Drop the servo lead through the open notch in the outboard wall. Optional M2 screws through the tab holes; otherwise zip-tie through the well.
-4. Fit a round horn on each foot servo. Bolt the matching shin’s bottom flange onto that horn (**L** / **R** stamps on the big toes).
+4. Fit a round horn on each foot servo. Bolt the matching shin’s bottom flange onto that horn.
 5. Mount the Pi Zero W on the four standoffs (USB/HDMI toward the rear). Strap the 2S pack under the deck. Sit the BECs on the raised pads. Route foot-servo wires up the U and through the rim holes next to each hip.
 6. Home angles and GPIO are still those in `iv.py`; power the servo rail from the 3–4 A BEC, not from the Pi 5 V pin.
 

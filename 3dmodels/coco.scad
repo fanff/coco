@@ -33,9 +33,9 @@ function coco_foot_motor_top_z() = MG90S_BODY_W / 2;
 // Four overlapping gnome-toe blobs (flattened spheres), inboard → outboard.
 // Centres are close enough that the balls collide instead of splitting.
 coco_toe_x = [38.0, toe_reach, 42.0, 37.0];
-coco_toe_y = [-15.0, -4.5, 5.5, 15.0];
-coco_toe_d = [18.0, 16.0, 15.0, 14.0];
-toe_z_scale = 0.45;   // squash the spheres in Z (still round, not a flat slab)
+coco_toe_y = [-12.5, -5.0, 2.0, 9.0];
+coco_toe_d = [16.0, 15.0, 14.0, 13.0];
+toe_z_scale = 0.65;   // squash the spheres in Z (a bit taller than a flat slab)
 
 // --- leg (U-channel shin; bottom bolts to the foot-servo horn) ---
 hip_flange_d = 26.0;
@@ -158,16 +158,16 @@ module coco_foot_sole_2d() {
     hull() {
         translate([heel_lip, coco_foot_sole_y()])
             circle(d = 12);
-        translate([8, -23])
-            circle(d = 14);
-        translate([8, 13])
+        translate([8, -16])
             circle(d = 12);
-        translate([32, -20])
-            circle(d = 16);
-        translate([32, 14])
-            circle(d = 14);
+        translate([8, 8])
+            circle(d = 11);
+        translate([32, -14])
+            circle(d = 13);
+        translate([32, 8])
+            circle(d = 11);
         translate([coco_foot_sole_x(), coco_foot_sole_y()])
-            circle(d = 18);
+            circle(d = 16);
     }
 }
 
@@ -194,7 +194,7 @@ module coco_foot_positive() {
                 coco_servo_cage_solid(pad = wall);
             translate([coco_foot_sole_x(), coco_foot_sole_y(), sole_z + 0.4])
                 linear_extrude(sole_t - 0.4)
-                    coco_rounded_rect([34, 32], r = 7);
+                    coco_rounded_rect([34, 26], r = 7);
         }
     }
 }
@@ -235,10 +235,10 @@ module coco_foot_cuts() {
         intersection() {
             translate([coco_foot_sole_x(), coco_foot_sole_y(), -0.2])
                 linear_extrude(2.0)
-                    coco_rounded_rect([26, 24], r = 6);
+                    coco_rounded_rect([26, 18], r = 6);
             for (x = [8, 18, 28])
                 translate([x, coco_foot_sole_y(), 0.85])
-                    cube([3.0, 18, 1.8], center = true);
+                    cube([3.0, 14, 1.8], center = true);
         }
     // Flatten anything that dipped below the sole bed (sphere bottoms).
     translate([0, 0, sole_z - 50])
@@ -251,13 +251,6 @@ module coco_foot(side = 1) {
             coco_foot_positive();
         mirror([0, side < 0 ? 1 : 0, 0])
             coco_foot_cuts();
-        // L/R on the big-toe blob (inboard).
-        translate([
-            coco_toe_x[0],
-            side * coco_toe_y[0],
-            -ankle_h + coco_toe_d[0] * toe_z_scale - 1.0
-        ])
-            coco_stamp_lr(side, h = 1.5);
     }
 }
 
