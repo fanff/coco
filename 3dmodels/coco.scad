@@ -570,8 +570,8 @@ module coco_foot_print(side = 1) {
 
 module coco_leg_print(side = 1) {
     // Flat on the bed: reverse-U in the XY print plane, outboard face up.
-    // Ankle stubs reach a little past the horn plane (y ≈ −2 on the left).
-    y_lo = side > 0 ? -2.0 : -(leg_y0 + leg_beam_d);
+    // The foot horn disk spans ±foot_boss_d/2 in Y; beams go further +Y.
+    y_lo = side > 0 ? -foot_boss_d / 2 : -(leg_y0 + leg_beam_d);
     translate([0, 0, -y_lo])
         rotate([90, 0, 0])
             coco_leg(side);
