@@ -1,5 +1,5 @@
 // Coco — assembled preview (not a printable part).
-// Opens in OpenSCAD F5 to check fit: 4× MG90S, two U-shaped legs, two feet, deck.
+// Opens in OpenSCAD F5 to check fit: 4× MG90S, two reverse-U legs, two feet, deck.
 // RGB axes sit on the left foot shaft (+X forward, +Y left, +Z up).
 // Default camera looks in from the rear-left so the in-foot motors are visible
 // (laid down in the green soles, shafts pointing backward).

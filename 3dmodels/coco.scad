@@ -51,14 +51,13 @@ coco_toe_y = [-1.5, 6.0, 13.0, 20.0];
 coco_toe_d = [16.0, 15.0, 14.0, 10.0];
 toe_z_scale = 0.65;   // squash the spheres in Z (a bit taller than a flat slab)
 
-// --- leg (U-channel shin; arms sit on the two foot anchors) ---
+// --- leg (simple reverse-U ∩; verticals sit on the two foot anchors) ---
 hip_flange_d = 26.0;
 hip_flange_h = 6.5;
-u_wall       = 3.6;    // U arm / web thickness
-u_inner_d    = 28.0;   // inside depth along −Y (inboard of the horn plane)
-u_ankle_clear = 18.0;  // U stops this far above the foot-servo shaft
-u_web_top_z  = -14.0;  // web stays below the hip servo body
-// Fore–aft span is the two anchors (shaft → 4 mm hole), not a free width.
+leg_beam_t   = 6.0;    // beam thickness (X for verticals; Z for the top bar)
+leg_beam_d   = 8.0;    // beam depth in Y (centred on the horn plane)
+leg_top_z    = -10.0;  // underside of the top bar (clears the hip body)
+// Fore–aft span is the two anchors (shaft → 4 mm hole).
 
 // --- base plate ---
 plate_x      = 114.0;
@@ -354,73 +353,68 @@ module coco_foot(side = 1) {
 }
 
 // =====================================================================
-// Leg — U-channel shin
+// Leg — simple reverse-U shin (∩)
 // Origin: hip shaft, horn plane at y = 0.
-// The U opens outboard (+Y). Its two arms sit on the foot anchors:
+// Two vertical posts drop to the foot anchors; a top bar joins them:
 //   rear  = shaft / round horn (x = 0)
 //   front = 4 mm mirror hole (x = coco_foot_mirror_hole_x())
 // =====================================================================
 function coco_u_x_aft() = coco_foot_shaft_anchor()[0];
 function coco_u_x_fore() = coco_foot_mirror_hole_x();
-function coco_u_y_web() = -(u_inner_d + u_wall);
 
-module coco_leg_u_2d() {
-    t = u_wall;
-    d = u_inner_d;
-    x0 = coco_u_x_aft();
-    x1 = coco_u_x_fore();
-    difference() {
-        translate([x0 - t, -(d + t)])
-            square([(x1 - x0) + 2 * t, d + t]);
-        translate([x0, -d])
-            square([x1 - x0, d + t + 8]);
-    }
+// Vertical post centred on x, from z_lo to z_hi, depth along Y at y = 0.
+module coco_leg_post(x, z_lo, z_hi) {
+    translate([x - leg_beam_t / 2, -leg_beam_d / 2, z_lo])
+        cube([leg_beam_t, leg_beam_d, z_hi - z_lo]);
 }
 
 module coco_leg_positive() {
-    z_bot = -leg_len + u_ankle_clear;
-    u_h = -z_bot + u_web_top_z + 2;
     x0 = coco_u_x_aft();
     x1 = coco_u_x_fore();
-    t = u_wall;
+    z_foot = -leg_len;
+    z_bar = leg_top_z;
+    peg_boss_h = leg_beam_t / 2 + 1.0;
     union() {
         // Hip horn flange (plastic outboard of the hip horn).
         rotate([-90, 0, 0])
             cylinder(d = hip_flange_d, h = hip_flange_h);
-        // U-channel from below the hip servo, stopping above the foot.
-        translate([0, 0, z_bot])
-            linear_extrude(u_h)
-                coco_leg_u_2d();
+        // Top bar of the reverse U.
+        translate([x0 - leg_beam_t / 2, -leg_beam_d / 2, z_bar])
+            cube([(x1 - x0) + leg_beam_t, leg_beam_d, leg_beam_t]);
+        // Blend the hip flange into the rear post / top bar.
         hull() {
             translate([0, 0.4, 0])
                 rotate([-90, 0, 0])
-                    cylinder(d = 20, h = hip_flange_h - 0.4);
-            translate([x0 - t, -4, u_web_top_z - 2])
-                cube([t + 5, 7, 8]);
+                    cylinder(d = 18, h = hip_flange_h - 0.4);
+            translate([x0 - leg_beam_t / 2, -leg_beam_d / 2, z_bar])
+                cube([leg_beam_t, leg_beam_d, leg_beam_t]);
         }
-        // Rear anchor: round-horn flange, plastic toward −X.
-        translate([0, 0, -leg_len])
+        // Rear vertical → shaft / round horn.
+        coco_leg_post(x0, z_foot + 4, z_bar + leg_beam_t);
+        // Front vertical → 4 mm peg.
+        coco_leg_post(x1, z_foot + 4, z_bar + leg_beam_t);
+        // Rear foot anchor: round-horn flange, plastic toward −X.
+        translate([0, 0, z_foot])
             rotate([0, -90, 0])
                 cylinder(d = foot_boss_d, h = foot_boss_h);
-        translate([-foot_boss_h, coco_u_y_web(), -leg_len - 8])
-            cube([foot_boss_h, -coco_u_y_web() + 3, 16]);
         hull() {
-            translate([-foot_boss_h, coco_u_y_web(), -leg_len + 6])
-                cube([foot_boss_h, u_wall + 2, 4]);
-            translate([x0 - t, coco_u_y_web(), z_bot])
-                cube([t + 3, u_wall + 2, 5]);
+            translate([x0 - leg_beam_t / 2, -leg_beam_d / 2, z_foot + 4])
+                cube([leg_beam_t, leg_beam_d, 8]);
+            translate([-foot_boss_h, -leg_beam_d / 2, z_foot - 4])
+                cube([foot_boss_h, leg_beam_d, 10]);
         }
-        // Front anchor: drop from the fore arm to a peg in the 4 mm hole.
+        // Front foot anchor: short boss + peg into the 4 mm window.
         hull() {
-            translate([x1, coco_u_y_web(), z_bot])
-                cube([t, -coco_u_y_web() + 2, 3]);
-            translate([x1, 0, -leg_len])
+            translate([x1 - leg_beam_t / 2, -leg_beam_d / 2, z_foot + 4])
+                cube([leg_beam_t, leg_beam_d, 8]);
+            translate([x1, 0, z_foot])
                 rotate([0, 90, 0])
-                    cylinder(d = 11, h = t);
+                    cylinder(d = 11, h = peg_boss_h);
         }
-        translate([x1 + t, 0, -leg_len])
+        // Overlap the peg into the boss so the union stays one volume.
+        translate([x1 + peg_boss_h - 0.6, 0, z_foot])
             rotate([0, -90, 0])
-                cylinder(d = coco_foot_mirror_peg_d(), h = t + wall);
+                cylinder(d = coco_foot_mirror_peg_d(), h = peg_boss_h + wall + 0.6);
     }
 }
 
@@ -448,9 +442,6 @@ module coco_leg_cuts() {
     // Flatten the ankle so it stays above the sole.
     translate([0, 0, -leg_len - 40 - 9])
         cube([80, 50, 80], center = true);
-    // Cable slot through the rear arm, down toward the foot servo.
-    translate([coco_u_x_aft() - u_wall / 2, -10, -leg_len + u_ankle_clear + 8])
-        cube([u_wall + 4, 8, 6], center = true);
 }
 
 module coco_leg(side = 1) {
@@ -459,10 +450,11 @@ module coco_leg(side = 1) {
             coco_leg_positive();
         mirror([0, side < 0 ? 1 : 0, 0])
             coco_leg_cuts();
+        // L/R stamp on the outboard face of the front post.
         translate([
-            coco_u_x_fore() + u_wall + 0.15,
-            side * (-u_inner_d * 0.45),
-            -leg_len * 0.52
+            coco_u_x_fore() + leg_beam_t / 2 + 0.15,
+            side * (leg_beam_d * 0.15),
+            -leg_len * 0.55
         ])
             rotate([0, -90, 0])
                 coco_stamp_lr(side, h = 1.8);
@@ -569,8 +561,8 @@ module coco_foot_print(side = 1) {
 }
 
 module coco_leg_print(side = 1) {
-    // Inboard web on the bed, U opening upward (outboard).
-    translate([0, 0, u_inner_d + u_wall])
+    // Flat on the bed: reverse-U in the XY print plane, hip flange up (+Y).
+    translate([0, 0, leg_beam_d / 2])
         rotate([90, 0, 0])
             coco_leg(side);
 }
