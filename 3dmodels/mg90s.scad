@@ -60,10 +60,12 @@ module mg90s_orient_shaft_y(dir = 1, spin = 180) {
                 children();
 }
 
-// Foot servo: 90° about world +Z from the hip Y-shaft pose.
-// Shaft points world −X (backward). Body is laid down in the sole
-// (local width → +Z); the 23 mm body occupies +X (toward the toes).
-module mg90s_orient_foot(spin = 180) {
+// Foot servo: 90° about world +Z from the hip Y-shaft pose, then 180°
+// about the shaft (world X). Shaft still points world −X (backward).
+// Body is laid down in the sole (local width → −Z); the 23 mm body
+// occupies +X (toward the toes). Cable sits toward world −Y (inboard
+// on the left foot). spin=0 is that 180° X-flip vs the hip's spin=180.
+module mg90s_orient_foot(spin = 0) {
     rotate([0, 0, 90])
         mg90s_orient_shaft_y(dir = 1, spin = spin)
             children();

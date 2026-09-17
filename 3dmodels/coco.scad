@@ -26,8 +26,8 @@ ankle_h      = MG90S_BODY_W / 2 + clearance + wall + sole_t;
 // Well footprint in foot XY after mg90s_orient_foot (left foot, shaft at origin).
 function coco_foot_well_xmin() = -wall;
 function coco_foot_well_xmax() = mg90s_horn_z() + wall;
-function coco_foot_well_ymin() = -(mg90s_body_xmax() + wall);
-function coco_foot_well_ymax() = -(mg90s_body_xmin() - wall);
+function coco_foot_well_ymin() = mg90s_body_xmin() - wall;
+function coco_foot_well_ymax() = mg90s_body_xmax() + wall;
 function coco_foot_sole_x() = (coco_foot_well_xmin() + coco_foot_well_xmax()) / 2;
 function coco_foot_sole_y() = (coco_foot_well_ymin() + coco_foot_well_ymax()) / 2;
 // Slight tuck under the well walls; the sole then hulls forward to the toes.
@@ -41,7 +41,7 @@ function coco_foot_motor_top_z() = MG90S_BODY_W / 2;
 // Four overlapping gnome-toe blobs (flattened spheres), inboard → outboard.
 // Centres are close enough that the balls collide instead of splitting.
 coco_toe_x = [38.0, toe_reach, 42.0, 37.0];
-coco_toe_y = [-12.5, -5.0, 2.0, 9.0];
+coco_toe_y = [-1.5, 6.0, 13.0, 20.0];
 coco_toe_d = [16.0, 15.0, 14.0, 10.0];
 toe_z_scale = 0.65;   // squash the spheres in Z (a bit taller than a flat slab)
 
@@ -194,6 +194,8 @@ module coco_servo_hatch(dir = 1) {
 
 // =====================================================================
 // Foot — MG90S lives in the sole, laid down, shaft pointing backward (−X).
+// 180° about that shaft (world X) vs the previous pose: cable inboard,
+// shaft hole at the heel and 4 mm window still coaxial on X.
 // Origin: output shaft. Horn plane is YZ at x = 0 (horn toward −X).
 // Body occupies +X (forward). Print sole-down.
 // The well is sliced at the motor top (world +Z = BODY_W/2) so the servo
@@ -267,13 +269,13 @@ module coco_foot_positive() {
 }
 
 // Open-top slot at the cable end so the lead drops in with the servo.
-// Local +Y is world +Z after mg90s_orient_foot, so the cube runs up
-// through the motor-top plane and out the wall (local −X / outboard).
+// After the 180° X-flip, local −Y is world +Z, so the cube runs up
+// through the motor-top plane and out the wall (local −X / inboard).
 module coco_foot_wire_notch() {
     nw = 8.0;
     translate([
         mg90s_body_xmin() - 28,
-        -4.0,
+        -20.0,
         -1.0
     ])
         cube([26, 24, nw]);
