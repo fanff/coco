@@ -155,19 +155,20 @@ module coco_servo_hatch(dir = 1) {
 // 2D pad in foot XY (shaft at the origin). Left foot; right is Y-mirrored.
 // Toes are 3D blobs in coco_foot_positive(), not split 2D fingers.
 module coco_foot_sole_2d() {
+    // Tight pad under the socket walls (hugs the well; toes are separate blobs).
     hull() {
         translate([heel_lip, coco_foot_sole_y()])
-            circle(d = 12);
-        translate([8, -16])
-            circle(d = 12);
-        translate([8, 8])
-            circle(d = 11);
-        translate([32, -14])
-            circle(d = 13);
-        translate([32, 8])
-            circle(d = 11);
+            circle(d = 9);
+        translate([8, -11])
+            circle(d = 9);
+        translate([8, 4])
+            circle(d = 8);
+        translate([28, -11])
+            circle(d = 9);
+        translate([28, 4])
+            circle(d = 8);
         translate([coco_foot_sole_x(), coco_foot_sole_y()])
-            circle(d = 16);
+            circle(d = 12);
     }
 }
 
@@ -194,7 +195,7 @@ module coco_foot_positive() {
                 coco_servo_cage_solid(pad = wall);
             translate([coco_foot_sole_x(), coco_foot_sole_y(), sole_z + 0.4])
                 linear_extrude(sole_t - 0.4)
-                    coco_rounded_rect([34, 26], r = 7);
+                    coco_rounded_rect([28, 20], r = 5);
         }
     }
 }
@@ -212,6 +213,14 @@ module coco_foot_wire_notch() {
         cube([32, 24, nw]);
 }
 
+// Round window in the front socket wall, opposite the shaft (−X).
+// Axis is the output shaft; the cutter runs toward +X (toes).
+module coco_foot_front_hole(d = 9.0) {
+    translate([mg90s_horn_z() - 4, 0, 0])
+        rotate([0, 90, 0])
+            cylinder(d = d, h = 28);
+}
+
 module coco_foot_cuts() {
     sole_z = -ankle_h;
     mg90s_orient_foot()
@@ -220,6 +229,7 @@ module coco_foot_cuts() {
             mg90s_tab_screws(d = 2.2, h = 36);
             coco_foot_wire_notch();
         }
+    coco_foot_front_hole();
     // Slice at the motor top: remove all green plastic above this plane.
     translate([0, 0, coco_foot_motor_top_z() + 50])
         cube([200, 200, 100], center = true);
@@ -235,10 +245,10 @@ module coco_foot_cuts() {
         intersection() {
             translate([coco_foot_sole_x(), coco_foot_sole_y(), -0.2])
                 linear_extrude(2.0)
-                    coco_rounded_rect([26, 18], r = 6);
+                    coco_rounded_rect([22, 14], r = 5);
             for (x = [8, 18, 28])
                 translate([x, coco_foot_sole_y(), 0.85])
-                    cube([3.0, 14, 1.8], center = true);
+                    cube([3.0, 10, 1.8], center = true);
         }
     // Flatten anything that dipped below the sole bed (sphere bottoms).
     translate([0, 0, sole_z - 50])
