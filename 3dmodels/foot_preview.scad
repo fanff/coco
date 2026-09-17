@@ -5,6 +5,7 @@
 
 include <coco.scad>
 
+// 3/4 view (default). Top-down XY: $vpr=[0,0,0]; $vpt=[12,0,0]; $vpd=140.
 $vpr = [68, 0, 48];
 $vpt = [14, 0, -2];
 $vpd = 130;
