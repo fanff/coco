@@ -97,42 +97,42 @@ module coco_label(txt, size = 6, h = 0.7) {
 // Preview-only RGB triad (not used by printable parts).
 // Robot / left-foot frame: +X forward (toes), +Y left, +Z up.
 // Origin is the foot-servo output shaft; −X is the shaft / heel.
-module coco_axis_arrow(len, d = 1.3) {
+module coco_axis_arrow(len, d = 2.0) {
     fn = 16;
     cylinder(d = d, h = len, $fn = fn);
     translate([0, 0, len])
-        cylinder(d1 = d * 2.6, d2 = 0.15, h = 5.5, $fn = fn);
+        cylinder(d1 = d * 2.4, d2 = 0.15, h = 6.5, $fn = fn);
 }
 
 module coco_axes(len = 32) {
     color("White")
-        sphere(d = 3.2, $fn = 20);
+        sphere(d = 4.0, $fn = 20);
     // +X forward (toes)
     color("Red") {
         rotate([0, 90, 0])
             coco_axis_arrow(len);
-        translate([len + 9, 0, 2])
-            coco_label("+X", size = 5, h = 1.2);
+        translate([len + 10, -7, 6])
+            coco_label("+X", size = 6, h = 1.4);
     }
     // −X shaft / heel (shorter)
     color("Maroon") {
         rotate([0, -90, 0])
             coco_axis_arrow(len * 0.42);
-        translate([-(len * 0.42 + 8), 0, 2])
-            coco_label("-X", size = 4, h = 1.2);
+        translate([-(len * 0.42 + 10), -7, 6])
+            coco_label("-X", size = 5, h = 1.4);
     }
     // +Y left (outboard on the left foot)
     color("LimeGreen") {
         rotate([-90, 0, 0])
             coco_axis_arrow(len);
-        translate([0, len + 9, 2])
-            coco_label("+Y", size = 5, h = 1.2);
+        translate([7, len + 10, 6])
+            coco_label("+Y", size = 6, h = 1.4);
     }
     // +Z up
     color("DodgerBlue") {
         coco_axis_arrow(len);
-        translate([6, 0, len + 8])
-            coco_label("+Z", size = 5, h = 1.2);
+        translate([8, 7, len + 10])
+            coco_label("+Z", size = 6, h = 1.4);
     }
 }
 
