@@ -42,7 +42,7 @@ Each hip servo lives in a well on the base. The matching **leg** bolts onto the 
 
 Each **foot** servo lives *in the sole* (the green part in `assembly.scad`), laid down so the 12.4 mm body width is vertical. That pose is the hip Y-shaft orientation turned **90° about +Z**: the output shaft points **backward** (−X), the 23 mm body occupies +X (toward the toes), and the round horn sticks out the heel. The well is sliced by a horizontal plane at the **motor top**, so there is no roof or wall above the servo — it slides in from above. A **notch from the top** of the outboard wall lets the servo lead pass through as the motor drops in.
 
-The ground plate is a compact **gnome foot**: four overlapping flattened-sphere toes in front (the balls collide so they are not split fingers), a pad that **hugs into the motor socket** (the sole tucks under the well walls), and a **short heel** so the shin flange still clears at the back. The front wall of the well — opposite the shaft / heel horn — has a round **through-hole** on the shaft axis. Well walls may rise in Z around the motor and a bit toward the front. The bottom of the shin is a horn flange that bolts onto that horn, so commanding `feetL` / `feetR` pitches the foot. Left and right parts are mirrors.
+The ground plate is a compact **gnome foot**: four overlapping flattened-sphere toes in front (the balls collide so they are not split fingers; the outboard toe is the smallest), a sole that **runs from the motor housing out to the toes**, and a **short heel** so the shin flange still clears at the back. Around the well the pad still **hugs the socket** (walls do not flare). The front wall of the well — opposite the shaft / heel horn — has a round **through-hole** on the shaft axis (`front_hole_d`, default 4 mm). Well walls may rise in Z around the motor and a bit toward the front. The bottom of the shin is a horn flange that bolts onto that horn, so commanding `feetL` / `feetR` pitches the foot. Left and right parts are mirrors.
 
 Default layout in `coco.scad` (edit these to retune stance):
 
@@ -52,6 +52,9 @@ Default layout in `coco.scad` (edit these to retune stance):
 | `leg_len` | 56 mm | Hip shaft to foot-servo shaft (Z) |
 | `ankle_h` | 14.2 mm | Foot-servo shaft above the ground (`BODY_W/2 + clearance + wall + sole_t`) |
 | `toe_reach` | 43 mm | Forward-most toe-ball centre, from the foot-servo shaft |
+| `coco_toe_d` | 16, 15, 14, 10 mm | Toe-ball diameters (inboard → outboard) |
+| `front_hole_d` | 4 mm | Round hole in the front socket wall (shaft axis) |
+| `hug_inset` | 2 mm | How far the well pad tucks under the socket walls |
 | `heel_lip` | 2 mm | Sole behind the shaft (kept short for the shin) |
 | `u_inner_w` × `u_inner_d` | 30 × 28 mm | U-channel inside (X × Y) |
 | `u_wall` | 3.6 mm | U arm / web thickness |
@@ -109,4 +112,4 @@ Each foot and each leg exports as **one printable shell** (no floating chips). T
 5. Mount the Pi Zero W on the four standoffs (USB/HDMI toward the rear). Strap the 2S pack under the deck. Sit the BECs on the raised pads. Route foot-servo wires up the U and through the rim holes next to each hip.
 6. Home angles and GPIO are still those in `iv.py`; power the servo rail from the 3–4 A BEC, not from the Pi 5 V pin.
 
-Tune `clearance` in `coco.scad` if a clone body is tight or sloppy. Tune `hip_span`, `leg_len`, `ankle_h`, `toe_reach`, `coco_toe_*`, and `u_inner_w` / `u_inner_d` there if you change stance, footprint, or shin section.
+Tune `clearance` in `coco.scad` if a clone body is tight or sloppy. Tune `hip_span`, `leg_len`, `ankle_h`, `toe_reach`, `coco_toe_*`, `front_hole_d`, `hug_inset`, and `u_inner_w` / `u_inner_d` there if you change stance, footprint, hole size, or shin section.
