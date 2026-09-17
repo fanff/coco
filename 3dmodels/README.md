@@ -59,8 +59,9 @@ Default layout in `coco.scad` (edit these to retune stance):
 | `hug_inset` | 2 mm | How far the well pad tucks under the socket walls |
 | `heel_lip` | 2 mm | Sole behind the shaft (kept short for the shin) |
 | `leg_beam_t` | 6 mm | Reverse-U beam thickness |
-| `leg_beam_d` | 8 mm | Reverse-U beam depth (Y) |
-| `leg_top_z` | −10 mm | Underside of the top bar below the hip shaft |
+| `leg_beam_d` | 20 mm | Reverse-U beam depth along +Y (outboard) |
+| `leg_y0` | 2 mm | Inboard face of the beams (slightly outboard of horn plane) |
+| `leg_top_z` | −leg_len+10 | Underside of the top bar (just above the foot motor) |
 | `clearance` | 0.40 mm | MG90S pocket clearance |
 
 ## Bill of materials (hardware)
@@ -100,7 +101,7 @@ Or: `make stl`. Open `assembly.scad`, `foot_preview.scad`, or `ankle_preview.sca
 Suggested bed orientation (already applied in the printable files):
 
 - **Feet** — sole on the bed. Well is open at the motor top (no roof); no supports.
-- **Legs** — reverse-U flat on the bed, hip flange up (`coco_leg_print`). No supports.
+- **Legs** — reverse-U flat on the bed, outboard face up (`coco_leg_print`). No supports.
 - **Base plate** — floor on the bed, wells facing up
 
 Each foot and each leg exports as **one printable shell** (no floating chips). The foot servo **slides** into the sole from above (the well is cut off at the motor top); a zip-tie through the well retains it if you skip the tab screws. The shin’s rear post bolts onto the horn at the heel; the front post’s peg goes through the 4 mm window.
