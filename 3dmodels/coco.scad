@@ -23,9 +23,15 @@ foot_boss_h  = 6.5;
 foot_boss_d  = 22.0;
 ankle_h      = MG90S_BODY_W / 2 + clearance + wall + sole_t;
 
-// Sole sits under the laid-down body (shaft is not at the body centre).
-function coco_foot_sole_x() = 16.0;
-function coco_foot_sole_y() = -(mg90s_body_xmin() + mg90s_body_xmax()) / 2;
+// Well footprint in foot XY after mg90s_orient_foot (left foot, shaft at origin).
+function coco_foot_well_xmin() = -wall;
+function coco_foot_well_xmax() = mg90s_horn_z() + wall;
+function coco_foot_well_ymin() = -(mg90s_body_xmax() + wall);
+function coco_foot_well_ymax() = -(mg90s_body_xmin() - wall);
+function coco_foot_sole_x() = (coco_foot_well_xmin() + coco_foot_well_xmax()) / 2;
+function coco_foot_sole_y() = (coco_foot_well_ymin() + coco_foot_well_ymax()) / 2;
+// How far the ground pad tucks under the well walls (hug into the socket).
+hug_inset = 5.5;
 // Laid-down motor top (world +Z). Everything above this plane is cut away
 // so the servo can slide into the well from above.
 function coco_foot_motor_top_z() = MG90S_BODY_W / 2;
@@ -152,23 +158,26 @@ module coco_servo_hatch(dir = 1) {
 // a little margin around the motor, four overlapping flattened-sphere toes.
 // =====================================================================
 
+// Axis-aligned rounded outline of the motor well in foot XY.
+module coco_foot_well_2d() {
+    w = coco_foot_well_xmax() - coco_foot_well_xmin();
+    d = coco_foot_well_ymax() - coco_foot_well_ymin();
+    translate([coco_foot_sole_x(), coco_foot_sole_y()])
+        coco_rounded_rect([w, d], r = 4);
+}
+
 // 2D pad in foot XY (shaft at the origin). Left foot; right is Y-mirrored.
 // Toes are 3D blobs in coco_foot_positive(), not split 2D fingers.
+// Inset from the well so the exterior walls taper into the socket.
 module coco_foot_sole_2d() {
-    // Tight pad under the socket walls (hugs the well; toes are separate blobs).
-    hull() {
-        translate([heel_lip, coco_foot_sole_y()])
-            circle(d = 9);
-        translate([8, -11])
-            circle(d = 9);
-        translate([8, 4])
-            circle(d = 8);
-        translate([28, -11])
-            circle(d = 9);
-        translate([28, 4])
-            circle(d = 8);
+    w = coco_foot_well_xmax() - coco_foot_well_xmin() - 2 * hug_inset;
+    d = coco_foot_well_ymax() - coco_foot_well_ymin() - 2 * hug_inset;
+    intersection() {
         translate([coco_foot_sole_x(), coco_foot_sole_y()])
-            circle(d = 12);
+            coco_rounded_rect([w, d], r = 6);
+        // Keep the heel short so the shin flange still clears.
+        translate([heel_lip - 1, -40])
+            square([90, 80]);
     }
 }
 
@@ -189,13 +198,14 @@ module coco_foot_positive() {
             for (i = [0 : 3])
                 coco_foot_toe_ball(i);
         }
-        // Well walls around the motor only (do not hull out to the toe tips).
+        // Well walls around the motor, hulled down into the tucked pad
+        // so the exterior cinches into the socket instead of a wide brim.
         hull() {
             mg90s_orient_foot()
                 coco_servo_cage_solid(pad = wall);
-            translate([coco_foot_sole_x(), coco_foot_sole_y(), sole_z + 0.4])
-                linear_extrude(sole_t - 0.4)
-                    coco_rounded_rect([28, 20], r = 5);
+            translate([0, 0, sole_z + 0.3])
+                linear_extrude(sole_t - 0.3)
+                    coco_foot_sole_2d();
         }
     }
 }
@@ -213,12 +223,12 @@ module coco_foot_wire_notch() {
         cube([32, 24, nw]);
 }
 
-// Round window in the front socket wall, opposite the shaft (−X).
-// Axis is the output shaft; the cutter runs toward +X (toes).
+// Round window in the front socket wall, opposite the shaft (−X / heel).
+// Coaxial with the output shaft; cutter stays in the wall (does not reach the toes).
 module coco_foot_front_hole(d = 9.0) {
-    translate([mg90s_horn_z() - 4, 0, 0])
+    translate([mg90s_horn_z() - 1.5, 0, 0])
         rotate([0, 90, 0])
-            cylinder(d = d, h = 28);
+            cylinder(d = d, h = wall + 7);
 }
 
 module coco_foot_cuts() {
@@ -240,15 +250,15 @@ module coco_foot_cuts() {
     translate([mg90s_horn_z() * 0.45, coco_foot_sole_y(), -MG90S_BODY_W / 2 - 0.8])
         rotate([90, 0, 0])
             cylinder(d = 3.4, h = 80, center = true);
-    // Inset tread on the pad (not the toes — offset would pinch them).
+    // Inset tread on the tucked pad (not the toes — offset would pinch them).
     translate([0, 0, sole_z])
         intersection() {
-            translate([coco_foot_sole_x(), coco_foot_sole_y(), -0.2])
+            translate([0, 0, -0.2])
                 linear_extrude(2.0)
-                    coco_rounded_rect([22, 14], r = 5);
-            for (x = [8, 18, 28])
+                    coco_foot_sole_2d();
+            for (x = [8, 16, 24])
                 translate([x, coco_foot_sole_y(), 0.85])
-                    cube([3.0, 10, 1.8], center = true);
+                    cube([3.0, 12, 1.8], center = true);
         }
     // Flatten anything that dipped below the sole bed (sphere bottoms).
     translate([0, 0, sole_z - 50])
