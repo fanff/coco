@@ -16,7 +16,8 @@ Shared libraries (not printed on their own):
 |------|------|
 | `mg90s.scad` | MG90S body, pocket cutter, round-horn pattern, `mg90s_orient_foot` |
 | `coco.scad` | Robot dimensions and the part modules |
-| `assembly.scad` | Preview of the full robot (F5 in OpenSCAD) — **do not print** |
+| `assembly.scad` | Preview of the full robot (F5) — **do not print**. RGB axes at the left ankle. |
+| `foot_preview.scad` | Left foot + motor + XYZ triad at the shaft — **do not print** |
 
 All dimensions are millimetres. The `.scad` files are the source of truth; export STL when you are ready to slice.
 
@@ -83,7 +84,7 @@ openscad -o stl/leg_right.stl   leg_right.scad
 openscad -o stl/base_plate.stl  base_plate.scad
 ```
 
-Or: `make stl`. Open `assembly.scad` and press **F5** to inspect the fit before printing.
+Or: `make stl`. Open `assembly.scad` or `foot_preview.scad` and press **F5** to inspect the fit before printing. Both draw an RGB triad at the left foot-servo shaft: **+X** red (forward / toes), **+Y** green (left / outboard), **+Z** blue (up), **−X** maroon (shaft / heel). That is the frame `coco.scad` uses; the right foot is a Y-mirror of it.
 
 ## Print settings
 

@@ -43,6 +43,11 @@ module coco_assembly(exploded = 0) {
             color(s > 0 ? "YellowGreen" : "OliveDrab")
                 coco_foot(s);
     }
+
+    // World / left-foot frame at the left ankle shaft (coco.scad origin).
+    // +X forward, +Y left, +Z up, −X shaft/heel. Right foot is a Y-mirror.
+    translate([hip_x, coco_hip_y(1), ankle_h])
+        coco_axes(len = 24);
 }
 
 exploded = 0; // set to 1 for an exploded preview
