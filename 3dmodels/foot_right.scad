@@ -1,3 +1,3 @@
-// Coco — right foot (print sole down).
+// Coco — right foot (print sole down). Open MG90S well in the sole.
 include <coco.scad>
 coco_foot_print(side = -1);
