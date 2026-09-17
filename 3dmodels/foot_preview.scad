@@ -18,3 +18,4 @@ color("SteelBlue")
         mg90s_dummy();
 
 coco_axes(len = 28);
+coco_foot_anchor_markers();

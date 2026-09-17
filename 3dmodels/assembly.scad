@@ -49,6 +49,8 @@ module coco_assembly(exploded = 0) {
     // +X forward, +Y left, +Z up, −X shaft/heel. Right foot is a Y-mirror.
     translate([hip_x, coco_hip_y(1), ankle_h])
         coco_axes(len = 24);
+    translate([hip_x, coco_hip_y(1), ankle_h])
+        coco_foot_anchor_markers();
 }
 
 exploded = 0; // set to 1 for an exploded preview
