@@ -186,16 +186,19 @@ module coco_foot_well_pad_2d() {
 module coco_foot_sole_2d() {
     hull() {
         coco_foot_well_pad_2d();
+        // Forefoot plate under the balls (not a matching disk per toe,
+        // which made a coplanar kiss with the sphere cuts).
         for (i = [0 : 3])
-            translate([coco_toe_x[i], coco_toe_y[i]])
-                circle(d = coco_toe_d[i] * 0.84);
+            translate([coco_toe_x[i] - 4, coco_toe_y[i]])
+                circle(d = coco_toe_d[i] * 0.70);
     }
 }
 
 // Flattened sphere sitting on the sole bed, overlapping its neighbours.
+// Sunk into the plate so the union is a volume, not a tangent kiss.
 module coco_foot_toe_ball(i) {
     r = coco_toe_d[i] / 2;
-    translate([coco_toe_x[i], coco_toe_y[i], r * toe_z_scale])
+    translate([coco_toe_x[i], coco_toe_y[i], r * toe_z_scale - 1.0])
         scale([1, 1, toe_z_scale])
             sphere(d = coco_toe_d[i]);
 }
@@ -231,15 +234,15 @@ module coco_foot_wire_notch() {
         -4.0,
         -1.0
     ])
-        cube([32, 24, nw]);
+        cube([26, 24, nw]);
 }
 
 // Round window in the front socket wall, opposite the shaft (−X / heel).
 // Coaxial with the output shaft; diameter is `front_hole_d`.
 module coco_foot_front_hole() {
-    translate([mg90s_horn_z() - 1.5, 0, 0])
+    translate([mg90s_horn_z() - 2, 0, 0])
         rotate([0, 90, 0])
-            cylinder(d = front_hole_d, h = wall + 7);
+            cylinder(d = front_hole_d, h = wall + 8);
 }
 
 module coco_foot_cuts() {
