@@ -6,7 +6,7 @@ OpenSCAD sources for a small **biped** walker built around **four MG90S** micro 
 |------|-----|------|
 | `foot_left.scad` | 1 | Left gnome sole (4 toes) + laid-down MG90S well (`feetL`) |
 | `foot_right.scad` | 1 | Right gnome sole (4 toes) + laid-down MG90S well (`feetR`) |
-| `leg_left.scad` | 1 | Left reverse-U shin: hip horn at the top; foot shaft + 4 mm peg at the bottom |
+| `leg_left.scad` | 1 | Left reverse-U shin: foot shaft + 4 mm peg at the bottom (hip attach TBD) |
 | `leg_right.scad` | 1 | Right reverse-U shin (mirror) |
 | `base_plate.scad` | 1 | Deck where both **hip** servos plug in, plus Pi Zero W / BEC / battery straps |
 
