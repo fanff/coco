@@ -359,11 +359,11 @@ module coco_foot(side = 1) {
 // Leg — simple reverse-U shin (∩)
 // Origin: hip shaft, horn plane at y = 0.
 // Two vertical posts drop to the foot anchors; a top bar joins them:
-//   rear  = shaft / round horn (x = 0)
+//   rear  = shaft plane (x = 0); round horn flange omitted for now
 //   front = 4 mm mirror hole (x = coco_foot_mirror_hole_x())
-// Beams live on the +Y (outboard) side of the horn plane; short stubs
-// reach back to y = 0 for the two foot anchors.
-// Hip flange and rear stem are left off for now.
+// Beams live on the +Y (outboard) side of the horn plane; a short stub
+// on the front post reaches y = 0 for the peg.
+// Hip flange, rear stem, and rear round horn boss are left off for now.
 // =====================================================================
 function coco_u_x_aft() = coco_foot_shaft_anchor()[0];
 function coco_u_x_fore() = coco_foot_mirror_hole_x();
@@ -384,21 +384,10 @@ module coco_leg_positive() {
         // Top bar of the reverse U (low over the foot, extending +Y).
         translate([x0 - leg_beam_t / 2, leg_y0, z_bar])
             cube([(x1 - x0) + leg_beam_t, leg_beam_d, leg_beam_t]);
-        // Rear vertical → shaft / round horn.
+        // Rear vertical at the shaft plane (no round horn boss yet).
         coco_leg_post(x0, z_foot + 2, z_bar + leg_beam_t);
         // Front vertical → 4 mm peg.
         coco_leg_post(x1, z_foot + 2, z_bar + leg_beam_t);
-        // Rear foot anchor: round-horn flange, plastic toward −X.
-        translate([0, 0, z_foot])
-            rotate([0, -90, 0])
-                cylinder(d = foot_boss_d, h = foot_boss_h);
-        // Stub from the outboard rear post in to the horn flange.
-        hull() {
-            translate([x0 - leg_beam_t / 2, leg_y0, z_foot + 2])
-                cube([leg_beam_t, leg_beam_d, 10]);
-            translate([-foot_boss_h, -2, z_foot - 4])
-                cube([foot_boss_h, max(leg_beam_d * 0.35, 4), 10]);
-        }
         // Front foot anchor: short boss + peg into the 4 mm window.
         hull() {
             translate([x1 - leg_beam_t / 2, leg_y0, z_foot + 2])
@@ -415,17 +404,6 @@ module coco_leg_positive() {
 }
 
 module coco_leg_cuts() {
-    // Rear foot anchor: horn seat, facing −X.
-    translate([0, 0, -leg_len])
-        rotate([0, -90, 0])
-            mg90s_horn_cuts(h = 22, seat = 1.4);
-    translate([0, 0, -leg_len])
-        rotate([0, -90, 0])
-            translate([0, 0, -1])
-                cylinder(d = 3.2, h = foot_boss_h + 10);
-    translate([-foot_boss_h + 1.5, 0, -leg_len])
-        rotate([0, -90, 0])
-            cylinder(d1 = 3.4, d2 = 6.5, h = 2.0);
     // Flatten the ankle so it stays above the sole.
     translate([0, 0, -leg_len - 40 - 9])
         cube([80, 80, 80], center = true);
@@ -549,8 +527,8 @@ module coco_foot_print(side = 1) {
 
 module coco_leg_print(side = 1) {
     // Flat on the bed: reverse-U in the XY print plane, outboard face up.
-    // The foot horn disk spans ±foot_boss_d/2 in Y; beams go further +Y.
-    y_lo = side > 0 ? -foot_boss_d / 2 : -(leg_y0 + leg_beam_d);
+    // Front peg boss is a d=11 disk at y = 0; beams sit further +Y.
+    y_lo = side > 0 ? -5.5 : -(leg_y0 + leg_beam_d);
     translate([0, 0, -y_lo])
         rotate([90, 0, 0])
             coco_leg(side);

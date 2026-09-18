@@ -6,7 +6,7 @@ OpenSCAD sources for a small **biped** walker built around **four MG90S** micro 
 |------|-----|------|
 | `foot_left.scad` | 1 | Left gnome sole (4 toes) + laid-down MG90S well (`feetL`) |
 | `foot_right.scad` | 1 | Right gnome sole (4 toes) + laid-down MG90S well (`feetR`) |
-| `leg_left.scad` | 1 | Left reverse-U shin: foot shaft + 4 mm peg at the bottom (hip attach TBD) |
+| `leg_left.scad` | 1 | Left reverse-U shin: front peg at the 4 mm hole (rear/hip attach TBD) |
 | `leg_right.scad` | 1 | Right reverse-U shin (mirror) |
 | `base_plate.scad` | 1 | Deck where both **hip** servos plug in, plus Pi Zero W / BEC / battery straps |
 
@@ -104,14 +104,14 @@ Suggested bed orientation (already applied in the printable files):
 - **Legs** — reverse-U flat on the bed, outboard face up (`coco_leg_print`). No supports.
 - **Base plate** — floor on the bed, wells facing up
 
-Each foot and each leg exports as **one printable shell** (no floating chips). The foot servo **slides** into the sole from above (the well is cut off at the motor top); a zip-tie through the well retains it if you skip the tab screws. The shin’s rear post bolts onto the horn at the heel; the front post’s peg goes through the 4 mm window.
+Each foot and each leg exports as **one printable shell** (no floating chips). The foot servo **slides** into the sole from above (the well is cut off at the motor top); a zip-tie through the well retains it if you skip the tab screws. The shin’s front post peg goes through the 4 mm window; the rear post sits at the shaft plane (round horn boss TBD).
 
 ## Assembly
 
 1. Drop the two **hip** MG90S units into the base wells, cables toward the Pi. Tabs sit in the side slots; optional M2 screws through the tab holes. Shafts point **outboard**.
 2. Fit a round horn on each hip. Bolt `leg_left` / `leg_right` onto those horns (horn screw through the printed flange).
 3. Slide an MG90S into each **foot** well from above, body laid down, shaft pointing **backward** (out the heel). The well has no roof — it is cut off at the motor top. Drop the servo lead through the open notch in the **inboard** wall (toward the other foot). Optional M2 screws through the tab holes; otherwise zip-tie through the well.
-4. Fit a round horn on each foot servo. Seat the matching shin so the rear flange bolts onto that horn and the front peg slides into the 4 mm hole.
+4. Fit a round horn on each foot servo. Seat the matching shin so the front peg slides into the 4 mm hole (rear horn attach TBD).
 5. Mount the Pi Zero W on the four standoffs (USB/HDMI toward the rear). Strap the 2S pack under the deck. Sit the BECs on the raised pads. Route foot-servo wires up between the reverse-U posts and through the rim holes next to each hip.
 6. Home angles and GPIO are still those in `iv.py`; power the servo rail from the 3–4 A BEC, not from the Pi 5 V pin.
 
