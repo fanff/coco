@@ -61,7 +61,7 @@ Default layout in `coco.scad` (edit these to retune stance):
 | `leg_beam_t` | 6 mm | Reverse-U beam thickness |
 | `leg_beam_d` | 20 mm | Reverse-U beam depth along +Y (outboard) |
 | `leg_y0` | 2 mm | Inboard face of the beams (slightly outboard of horn plane) |
-| `leg_top_z` | −leg_len+10 | Underside of the top bar (just above the foot motor) |
+| `leg_top_z` | −leg_len+10.5 | Underside of the top bar (just above the foot motor) |
 | `clearance` | 0.40 mm | MG90S pocket clearance |
 
 ## Bill of materials (hardware)

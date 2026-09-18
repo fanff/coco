@@ -1,4 +1,4 @@
-// Coco — left leg (reverse-U shin: hip horn at the top; foot shaft + 4 mm peg at the bottom).
-// Print flat on the bed, hip flange up.
+// Coco — left leg (reverse-U shin: foot shaft + 4 mm peg at the bottom; hip attach TBD).
+// Print flat on the bed, outboard face up.
 include <coco.scad>
 coco_leg_print(side = 1);

@@ -58,8 +58,9 @@ leg_beam_t   = 6.0;    // beam thickness (X for verticals; Z for the top bar)
 leg_beam_d   = 20.0;   // beam depth along +Y (outboard of the horn plane)
 leg_y0       = 2.0;    // inboard face of the beams; sits slightly outboard
 // Underside of the top bar: just above the foot motor (shaft at −leg_len).
-leg_top_z    = -leg_len + 10.0;
+leg_top_z    = -leg_len + 10.5;
 // Fore–aft span is the two anchors (shaft → 4 mm hole).
+// Hip flange / rear stem omitted for now (add back when the hip attach is ready).
 
 // --- base plate ---
 plate_x      = 114.0;
@@ -361,7 +362,8 @@ module coco_foot(side = 1) {
 //   rear  = shaft / round horn (x = 0)
 //   front = 4 mm mirror hole (x = coco_foot_mirror_hole_x())
 // Beams live on the +Y (outboard) side of the horn plane; short stubs
-// reach back to y = 0 for the hip flange and the two foot anchors.
+// reach back to y = 0 for the two foot anchors.
+// Hip flange and rear stem are left off for now.
 // =====================================================================
 function coco_u_x_aft() = coco_foot_shaft_anchor()[0];
 function coco_u_x_fore() = coco_foot_mirror_hole_x();
@@ -378,24 +380,10 @@ module coco_leg_positive() {
     z_foot = -leg_len;
     z_bar = leg_top_z;
     peg_boss_h = leg_beam_t / 2 + 1.0;
-    y_out = leg_y0 + leg_beam_d;
     union() {
-        // Hip horn flange (plastic outboard of the hip horn).
-        rotate([-90, 0, 0])
-            cylinder(d = hip_flange_d, h = hip_flange_h);
-        // Top bar of the reverse U (low under the hip, extending +Y).
+        // Top bar of the reverse U (low over the foot, extending +Y).
         translate([x0 - leg_beam_t / 2, leg_y0, z_bar])
             cube([(x1 - x0) + leg_beam_t, leg_beam_d, leg_beam_t]);
-        // Blend the hip flange into the upper rear post (not a full-height wedge).
-        hull() {
-            translate([0, 0.4, 0])
-                rotate([-90, 0, 0])
-                    cylinder(d = 18, h = max(hip_flange_h, y_out) - 0.4);
-            translate([x0 - leg_beam_t / 2, leg_y0, -8])
-                cube([leg_beam_t, leg_beam_d, 6]);
-        }
-        // Rear post column from the low top bar up toward the hip.
-        coco_leg_post(x0, z_bar, -2);
         // Rear vertical → shaft / round horn.
         coco_leg_post(x0, z_foot + 2, z_bar + leg_beam_t);
         // Front vertical → 4 mm peg.
@@ -427,15 +415,6 @@ module coco_leg_positive() {
 }
 
 module coco_leg_cuts() {
-    // Hip horn seat + through-holes. Screw comes in from +Y.
-    rotate([-90, 0, 0])
-        mg90s_horn_cuts(h = 22, seat = 1.4);
-    rotate([-90, 0, 0])
-        translate([0, 0, -1])
-            cylinder(d = 3.2, h = hip_flange_h + 10);
-    translate([0, hip_flange_h - 1.5, 0])
-        rotate([-90, 0, 0])
-            cylinder(d1 = 3.4, d2 = 6.5, h = 2.0);
     // Rear foot anchor: horn seat, facing −X.
     translate([0, 0, -leg_len])
         rotate([0, -90, 0])
